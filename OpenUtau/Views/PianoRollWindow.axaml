@@ -589,6 +589,14 @@
                       <Path Classes="stroked" Data="M 2.5 13.5 L 6.5 9.5 L 11.5 9.5 L 15.5 5.5"/>
                   </Grid>
             </ToggleButton>
+            <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20"
+                          IsChecked="{Binding NotesViewModel.LockStartTime}"
+                          Command="{Binding NotesViewModel.LockStartTimeCommand}"
+                          ToolTip.Tip="{DynamicResource pianoroll.toggle.lockStartTime}">
+                  <Grid Width="18" Height="18">
+                      <Path Classes="stroked" Data="M 4 4 L 4 15.5 M 4 10 L 12.5 4 L 12.5 15 Z"/>
+                  </Grid>
+            </ToggleButton>
           </StackPanel>
         </Border>
         <Border Grid.Column="4">

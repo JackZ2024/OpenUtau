@@ -80,7 +80,8 @@ namespace OpenUtau.Core.Metronome {
             if ((settingsData.Volume != Volume)) {
                 settingsData.Volume = Volume;
                 string jsonString = JsonConvert.SerializeObject(settingsData, Formatting.Indented);
-                File.WriteAllText("Metronome/MetronomeSetting.json", jsonString);
+                string settingPath = Path.Combine(PathManager.Inst.DataPath, "Metronome/MetronomeSetting.json");
+                File.WriteAllText(settingPath, jsonString);
             }
 
             timer?.Dispose();
@@ -100,19 +101,18 @@ namespace OpenUtau.Core.Metronome {
         private MetronomePlayer()
         {
             try {
-                string jsonString = File.ReadAllText("Metronome/MetronomeSetting.json");
+                string settingPath = Path.Combine(PathManager.Inst.DataPath, "Metronome/MetronomeSetting.json");
+                string jsonString = File.ReadAllText(settingPath);
                 settingsData = JsonConvert.DeserializeObject<MetronomeSetting>(jsonString);
                 if (settingsData != null) {
                     AccentedBeatPath = "Metronome/" + settingsData.AccentedBeatPath;
                     NormalBeatPath = "Metronome/" + settingsData.NormalBeatPath;
                 }
-            } catch {
-                //Console.WriteLine("Read MetronomeSetting Error!!!");
-            }
+            } catch { }
 
             // Create beat pattern
-            patternEngine.AccentedBeat = new SampleSource(AccentedBeatPath);
-            patternEngine.NormalBeat = new SampleSource(NormalBeatPath);
+            patternEngine.AccentedBeat = new SampleSource(Path.Combine(PathManager.Inst.RootPath, AccentedBeatPath));
+            patternEngine.NormalBeat = new SampleSource(Path.Combine(PathManager.Inst.RootPath, NormalBeatPath));
             AccentedPattern = patternEngine.CreateAccentedBeatPattern(BPM, Beats, NoteLength);
             NormalPattern = patternEngine.CreateNormalBeatPattern(BPM, Beats, NoteLength);
 
@@ -173,8 +173,8 @@ namespace OpenUtau.Core.Metronome {
         {
             AccentedBeatPath = accentedBeatPath;
             NormalBeatPath = normalBeatPath;
-            patternEngine.AccentedBeat = new SampleSource(AccentedBeatPath);
-            patternEngine.NormalBeat = new SampleSource(NormalBeatPath);
+            patternEngine.AccentedBeat = new SampleSource(Path.Combine(PathManager.Inst.RootPath, AccentedBeatPath));
+            patternEngine.NormalBeat = new SampleSource(Path.Combine(PathManager.Inst.RootPath, NormalBeatPath));
 
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, patternEngine.AccentedBeat.WaveFormat.Channels));
             mixer.ReadFully = true;

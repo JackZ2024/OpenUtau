@@ -104,6 +104,8 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<Unit, Unit> MetronomePlay { get; }
         [Reactive] public bool IsEditCurve { get; set; }
         public ReactiveCommand<Unit, Unit> EditCurveStart { get; }
+        [Reactive] public bool LockStartTime { get; set; }
+        public ReactiveCommand<Unit, Unit> LockStartTimeCommand { get; set; }
 
         public ReactiveCommand<int, Unit> SetSnapUnitCommand { get; set; }
         public ReactiveCommand<int, Unit> SetKeyCommand { get; set; }
@@ -246,6 +248,14 @@ namespace OpenUtau.App.ViewModels {
             IsEditCurve = false;
             EditCurveStart = ReactiveCommand.Create(() => {
                 MessageBus.Current.SendMessage(new CurvesRefreshEvent());
+            });
+            LockStartTime = Preferences.Default.LockStartTime != 0;
+            LockStartTimeCommand = ReactiveCommand.Create(() => {
+                if (LockStartTime) {
+                    Preferences.Default.LockStartTime = 1;
+                } else {
+                    Preferences.Default.LockStartTime = 0;
+                }
             });
 
             ShowTips = Preferences.Default.ShowTips;

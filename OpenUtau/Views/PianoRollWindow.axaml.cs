@@ -74,15 +74,15 @@ namespace OpenUtau.App.Views {
              };
 
             try {
-                string json = File.ReadAllText("keyGesture.json");
+                string keyGesturePath = Path.Combine(PathManager.Inst.DataPath, "keyGesture.json");
+                string json = File.ReadAllText(keyGesturePath);
+                
                 var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 if (dictionary != null) {
                     gestureDict = dictionary;
                 }
             }
-            catch {
-                //Console.WriteLine("Read KeyGesture Error!!!");
-            }
+            catch { }
 
             noteBatchEditCommand = ReactiveCommand.Create<BatchEdit>(async edit => {
                 var NotesVm = ViewModel?.NotesViewModel;

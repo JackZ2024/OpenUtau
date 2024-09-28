@@ -271,6 +271,7 @@ namespace OpenUtau.Core.Ustx {
                 notes = new SortedSet<UNote>(notes.Select(note => note.Clone())),
                 curves = curves.Select(c => c.Clone()).ToList(),
                 Duration = Duration,
+                remarks = new List<URemark>(remarks.Select(remark => remark.Clone())),
             };
         }
     }
