@@ -4,6 +4,7 @@ namespace OpenUtau.Core.SignalChain {
     public class WaveSource : ISignalSource {
         public readonly double offsetMs;
         public readonly double estimatedLengthMs;
+        public readonly int skipData;
         public readonly int offset;
         public readonly int estimatedLength;
         public readonly int channels;
@@ -16,9 +17,10 @@ namespace OpenUtau.Core.SignalChain {
 
         public WaveSource(double offsetMs, double estimatedLengthMs, double skipOverMs, int channels) {
             this.offsetMs = offsetMs;
+            this.skipData = (int)((skipOverMs) * 44100 / 1000) * channels;
             this.estimatedLengthMs = estimatedLengthMs;
             this.channels = channels;
-            offset = (int)((offsetMs - skipOverMs) * 44100 / 1000) * channels;
+            offset = (int)((offsetMs) * 44100 / 1000) * channels;
             estimatedLength = (int)(estimatedLengthMs * 44100 / 1000) * channels;
         }
 
@@ -44,9 +46,14 @@ namespace OpenUtau.Core.SignalChain {
                 return position;
             }
             int start = Math.Max(position, offset * copies);
-            int end = Math.Min(position + count, offset * copies + data.Length * copies);
+            int end = Math.Min(position + count, offset * copies + estimatedLength * copies);
             for (int i = start; i < end; ++i) {
-                buffer[index + i - position] += data[i / copies - offset];
+                int dataIndex = i / copies - offset + this.skipData;
+                if (dataIndex < 0 || dataIndex >= data.Length) {
+                    buffer[index + i - position] += 0;
+                } else {
+                    buffer[index + i - position] += data[dataIndex];
+                }
             }
             return end;
         }

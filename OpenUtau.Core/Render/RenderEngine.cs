@@ -85,11 +85,13 @@ namespace OpenUtau.Core.Render {
                     .Where(part => part.Samples != null)
                     .Select(part => {
                         double offsetMs = project.timeAxis.TickPosToMsPos(part.position);
+                        double skipMs = project.timeAxis.TickPosToMsPos(part.skipTicks);
+                        double trimMs = project.timeAxis.TickPosToMsPos(part.trimTicks);
                         double estimatedLengthMs = project.timeAxis.TickPosToMsPos(part.End) - offsetMs;
                         var waveSource = new WaveSource(
                             offsetMs,
                             estimatedLengthMs,
-                            part.skipMs, part.channels);
+                            skipMs, part.channels);
                         waveSource.SetSamples(part.Samples);
                         return (ISignalSource)waveSource;
                     }));

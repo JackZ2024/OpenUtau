@@ -89,7 +89,8 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<PitchPointHitInfo, Unit> PitSnapCommand { get; set; }
         public ReactiveCommand<PitchPointHitInfo, Unit> PitDelCommand { get; set; }
         public ReactiveCommand<PitchPointHitInfo, Unit> PitAddCommand { get; set; }
-        
+        public ReactiveCommand<List<UNote>, Unit> MergeNotesCommand { get; set; }
+
         private ReactiveCommand<Classic.Plugin, Unit> legacyPluginCommand;
 
         public PianoRollViewModel() {
@@ -141,6 +142,12 @@ namespace OpenUtau.App.ViewModels {
                 if (NotesViewModel.Part == null) { return; }
                 DocManager.Inst.StartUndoGroup();
                 DocManager.Inst.ExecuteCmd(new AddPitchPointCommand(NotesViewModel.Part, info.Note, new PitchPoint(info.X, info.Y), info.Index + 1));
+                DocManager.Inst.EndUndoGroup();
+            });
+            MergeNotesCommand = ReactiveCommand.Create<List<UNote>>(notes => {
+                if (NotesViewModel.Part == null) { return; }
+                DocManager.Inst.StartUndoGroup();
+                DocManager.Inst.ExecuteCmd(new MergeNotesCommand(NotesViewModel.Part, notes));
                 DocManager.Inst.EndUndoGroup();
             });
 

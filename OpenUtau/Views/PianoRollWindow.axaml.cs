@@ -859,6 +859,17 @@ namespace OpenUtau.App.Views {
                             Header = ThemeManager.GetString("pianoroll.menu.notedefaults"),
                             Command = noteDefaultsCommand,
                         });
+                        if (selectedNotes.Count == 2) {
+                            if (selectedNotes[0].tone == selectedNotes[1].tone && 
+                                (selectedNotes[0].End == selectedNotes[1].position || 
+                                selectedNotes[1].End == selectedNotes[0].position)) {
+                                ViewModel.NotesContextMenuItems.Add(new MenuItemViewModel() {
+                                    Header = ThemeManager.GetString("pianoroll.menu.notes.mergenotes"),
+                                    Command = ViewModel.MergeNotesCommand,
+                                    CommandParameter = selectedNotes,
+                                });
+                            }
+                        }
                         shouldOpenNotesContextMenu = true;
                         return;
                     }

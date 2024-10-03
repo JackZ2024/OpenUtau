@@ -231,7 +231,7 @@ namespace OpenUtau.App.Controls {
             }
             int posTick = (int)(TickOffset + x / TickWidth);
             double posMs = timeAxis.TickPosToMsPos(posTick);
-            double offsetMs = timeAxis.TickPosToMsPos(wavePart.position);
+            double offsetMs = timeAxis.TickPosToMsPos(wavePart.position - wavePart.skipTicks);
             int sampleIndex = (int)(wavePart.peaksSampleRate * (posMs - offsetMs) * 0.001);
             sampleIndex = Math.Clamp(sampleIndex, 0, peaks[0].Length);
             using (var frameBuffer = bitmap.Lock()) {

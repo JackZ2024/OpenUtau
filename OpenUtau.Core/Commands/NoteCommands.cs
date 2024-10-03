@@ -136,7 +136,40 @@ namespace OpenUtau.Core {
             }
         }
     }
-
+    public class MergeNotesCommand : NoteCommand {
+        readonly string OldLyrics;
+        readonly int deleteNoteIndex;
+        public MergeNotesCommand(UVoicePart part, List<UNote> notes) : base(part, notes) {
+            if (notes.Count != 2) {
+                throw new ArgumentException($"notes count {notes.Count} does not equal 2.");
+            }
+            if (notes[0].position > notes[1].position) {
+                deleteNoteIndex = 0;
+                OldLyrics = Notes[1].lyric;
+            }
+            else {
+                deleteNoteIndex = 1;
+                OldLyrics = Notes[0].lyric;
+            }
+        }
+        public override string ToString() { return $"Merge {Notes.Count()} notes togeter"; }
+        public override void Execute() {
+            lock (Part) {
+                Part.notes.Remove(Notes[deleteNoteIndex]);
+                Notes[1 - deleteNoteIndex].duration += Notes[deleteNoteIndex].duration;
+                if(Notes[1 - deleteNoteIndex].lyric != Notes[deleteNoteIndex].lyric && Notes[deleteNoteIndex].lyric != "+") {
+                    Notes[1 - deleteNoteIndex].lyric = Notes[1 - deleteNoteIndex].lyric + " " + Notes[deleteNoteIndex].lyric;
+                }
+            }
+        }
+        public override void Unexecute() {
+            lock (Part) {
+                Notes[1 - deleteNoteIndex].duration -= Notes[deleteNoteIndex].duration;
+                Part.notes.Add(Notes[deleteNoteIndex]);
+                Notes[1 - deleteNoteIndex].lyric = OldLyrics;
+            }
+        }
+    }
     public class ChangeNoteLyricCommand : NoteCommand {
         readonly string[] NewLyrics;
         readonly string[] OldLyrics;

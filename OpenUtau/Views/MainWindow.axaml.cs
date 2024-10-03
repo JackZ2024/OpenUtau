@@ -996,13 +996,18 @@ namespace OpenUtau.App.Views {
                     bool isWave = partControl.part is UWavePart;
                     bool trim = point.Position.X > partControl.Bounds.Right - ViewConstants.ResizeMargin;
                     bool skip = point.Position.X < partControl.Bounds.Left + ViewConstants.ResizeMargin;
-                    if (isVoice && trim) {
+                    if (isVoice && trim ) {
                         partEditState = new PartResizeEditState(control, viewModel, partControl.part);
                         Cursor = ViewConstants.cursorSizeWE;
+                    } else if (isVoice && skip) {
+                        partEditState = new PartSkipEditState(control, viewModel, partControl.part);
+                        Cursor = ViewConstants.cursorSizeWE;
                     } else if (isWave && skip) {
-                        // TODO
+                        partEditState = new WavPartSkipEditState(control, viewModel, partControl.part);
+                        Cursor = ViewConstants.cursorSizeWE;
                     } else if (isWave && trim) {
-                        // TODO
+                        partEditState = new WavPartResizeEditState(control, viewModel, partControl.part);
+                        Cursor = ViewConstants.cursorSizeWE;
                     } else {
                         partEditState = new PartMoveEditState(control, viewModel, partControl.part);
                         Cursor = ViewConstants.cursorSizeAll;
@@ -1051,10 +1056,11 @@ namespace OpenUtau.App.Views {
                 bool isWave = partControl.part is UWavePart;
                 bool trim = point.Position.X > partControl.Bounds.Right - ViewConstants.ResizeMargin;
                 bool skip = point.Position.X < partControl.Bounds.Left + ViewConstants.ResizeMargin;
-                if (isVoice && trim) {
+                if (isVoice && (trim || skip)) {
                     Cursor = ViewConstants.cursorSizeWE;
                 } else if (isWave && (skip || trim)) {
-                    Cursor = null; // TODO
+                    //Cursor = null; // TODO
+                    Cursor = ViewConstants.cursorSizeWE;
                 } else {
                     Cursor = null;
                 }

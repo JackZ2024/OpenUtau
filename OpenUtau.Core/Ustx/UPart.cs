@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Melanchall.DryWetMidi.MusicTheory;
 using NWaves.Operations;
 using NWaves.Signals;
 using OpenUtau.Api;
@@ -28,6 +29,7 @@ namespace OpenUtau.Core.Ustx {
         public UPart() { }
 
         public abstract int GetMinDurTick(UProject project);
+        public abstract int GetMaxPosTick(UProject project);
 
         public virtual void BeforeSave(UProject project, UTrack track) { }
         public virtual void AfterLoad(UProject project, UTrack track) { }
@@ -65,6 +67,15 @@ namespace OpenUtau.Core.Ustx {
             int endTicks = position + (notes.LastOrDefault()?.End ?? 1);
             project.timeAxis.TickPosToBarBeat(endTicks, out int bar, out int beat, out int remainingTicks);
             return project.timeAxis.BarBeatToTickPos(bar, beat + 1) - position;
+        }
+        public override int GetMaxPosTick(UProject project) {
+            if (notes.Count == 0) {
+                project.timeAxis.TickPosToBarBeat(End, out int bar, out int beat, out int remainingTicks);
+                return project.timeAxis.BarBeatToTickPos(bar, beat - 1);
+            } else {
+                int startTicks = position + (notes.FirstOrDefault()?.position ?? 1);
+                return startTicks;
+            }
         }
 
         public override void BeforeSave(UProject project, UTrack track) {
@@ -290,15 +301,16 @@ namespace OpenUtau.Core.Ustx {
 
         [YamlMember(Order = 100)] public string relativePath;
         [YamlMember(Order = 101)] public double fileDurationMs;
-        [YamlMember(Order = 102)] public double skipMs;
-        [YamlMember(Order = 103)] public double trimMs;
+        [YamlMember(Order = 102)] public int skipTicks = 0;
+        [YamlMember(Order = 103)] public int trimTicks = 0;
+
 
         [YamlIgnore]
         public override string DisplayName => Missing ? $"[Missing] {name}" : name;
         [YamlIgnore]
         public override int Duration {
             get => duration;
-            set { }
+            set { duration = value; }
         }
         [YamlIgnore] bool Missing { get; set; }
         [YamlIgnore] public float[] Samples { get; private set; }
@@ -311,17 +323,22 @@ namespace OpenUtau.Core.Ustx {
         private int duration;
 
         public override int GetMinDurTick(UProject project) {
-            double posMs = project.timeAxis.TickPosToMsPos(position);
-            int end = project.timeAxis.MsPosToTickPos(posMs + fileDurationMs);
-            return end - position;
+
+            int endTicks = position;
+            project.timeAxis.TickPosToBarBeat(endTicks, out int bar, out int beat, out int remainingTicks);
+            return project.timeAxis.BarBeatToTickPos(bar, beat + 1) - position;
+        }
+        public override int GetMaxPosTick(UProject project) {
+            project.timeAxis.TickPosToBarBeat(End, out int bar, out int beat, out int remainingTicks);
+            return project.timeAxis.BarBeatToTickPos(bar, beat - 1);
         }
 
         public override UPart Clone() {
             var part = new UWavePart() {
                 _filePath = _filePath,
                 relativePath = relativePath,
-                skipMs = skipMs,
-                trimMs = trimMs,
+                skipTicks = skipTicks,
+                trimTicks = trimTicks,
             };
             part.Load(DocManager.Inst.Project);
             return part;
@@ -395,7 +412,7 @@ namespace OpenUtau.Core.Ustx {
         private void UpdateDuration(UProject project) {
             double posMs = project.timeAxis.TickPosToMsPos(position);
             int end = project.timeAxis.MsPosToTickPos(posMs + fileDurationMs);
-            duration = end - position;
+            duration = end - position - skipTicks - trimTicks;
         }
 
         public override void BeforeSave(UProject project, UTrack track) {

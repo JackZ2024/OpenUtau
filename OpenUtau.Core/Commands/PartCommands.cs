@@ -1,4 +1,5 @@
-﻿using OpenUtau.Core.Ustx;
+﻿using System;
+using OpenUtau.Core.Ustx;
 
 namespace OpenUtau.Core {
     public abstract class PartCommand : UCommand {
@@ -58,6 +59,98 @@ namespace OpenUtau.Core {
         public override string ToString() => "Change parts duration";
         public override void Execute() => part.Duration = newDur;
         public override void Unexecute() => part.Duration = oldDur;
+    }
+    public class SkipPartCommand : PartCommand {
+        readonly int newDur, oldDur;
+        readonly int newPos, oldPos;
+        readonly int offsetX;
+        public SkipPartCommand(UProject project, UPart part, int position, int offsetX) : base(project, part) {
+            this.offsetX = offsetX;
+            newDur = part.Duration - offsetX;
+            oldDur = part.Duration;
+            newPos = position;
+            oldPos = part.position;
+        }
+        public override string ToString() => "Change voice parts position and duration";
+        public override void Execute() {
+            part.Duration = newDur;
+            part.position = newPos;
+            foreach (var remark in part.remarks) {
+                remark.position = remark.position - offsetX;
+            }
+            foreach (var note in ((UVoicePart)part).notes) {
+                note.position = note.position - offsetX;
+            }
+            foreach (var curve in ((UVoicePart)part).curves) {
+                for (int i = 0; i < curve.xs.Count; i++) {
+                    curve.xs[i] = curve.xs[i] - offsetX;
+                }
+            }
+        }
+        public override void Unexecute() {
+            part.position = oldPos;
+            part.Duration = oldDur;
+            foreach (var remark in part.remarks) {
+                remark.position = remark.position + offsetX;
+            }
+            foreach (var note in ((UVoicePart)part).notes) {
+                note.position = note.position + offsetX;
+            }
+            foreach (var curve in ((UVoicePart)part).curves) {
+                for (int i = 0; i < curve.xs.Count; i++) {
+                    curve.xs[i] = curve.xs[i] + offsetX;
+                }
+            }
+        }
+    }
+    public class ResizeWavPartCommand : PartCommand {
+        readonly int newDur, oldDur, newTrimTicks, oldTrimTicks;
+        public ResizeWavPartCommand(UProject project, UPart part, int offsetX) : base(project, part) {
+            newDur = part.Duration + offsetX;
+            oldDur = part.Duration;
+            newTrimTicks = ((UWavePart)part).trimTicks - offsetX;
+            oldTrimTicks = ((UWavePart)part).trimTicks;
+        }
+        public override string ToString() => "Change Wav parts duration";
+        public override void Execute() {
+            part.Duration = newDur;
+            ((UWavePart)part).trimTicks = newTrimTicks;
+        } 
+        public override void Unexecute() {
+            part.Duration = oldDur;
+            ((UWavePart)part).trimTicks = oldTrimTicks;
+        }
+    }
+    public class SkipWavPartCommand : PartCommand {
+        readonly int newDur, oldDur, newSkipTicks;
+        readonly int newPos, oldPos, oldSkipTicks;
+        readonly int offsetX;
+        public SkipWavPartCommand(UProject project, UPart part, int position, int offsetX) : base(project, part) {
+            this.offsetX = offsetX;
+            newDur = part.Duration - offsetX;
+            oldDur = part.Duration;
+            newPos = position;
+            oldPos = part.position;
+            newSkipTicks = ((UWavePart)part).skipTicks + offsetX;
+            oldSkipTicks = ((UWavePart)part).skipTicks;
+        }
+        public override string ToString() => "Change Wav parts position and duration";
+        public override void Execute() {
+            ((UWavePart)part).skipTicks = newSkipTicks;
+            part.position = newPos;
+            part.Duration = newDur;
+            foreach (var remark in part.remarks) {
+                remark.position = remark.position - offsetX;
+            }
+        }
+        public override void Unexecute() {
+            ((UWavePart)part).skipTicks = oldSkipTicks;
+            part.position = oldPos;
+            part.Duration = oldDur;
+            foreach (var remark in part.remarks) {
+                remark.position = remark.position + offsetX;
+            }
+        }
     }
 
     public class RenamePartCommand : PartCommand {

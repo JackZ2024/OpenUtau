@@ -182,6 +182,78 @@ namespace OpenUtau.App.Views {
             }
         }
     }
+    class PartSkipEditState : PartEditState {
+        public readonly UPart part;
+        public PartSkipEditState(Control control, MainWindowViewModel vm, UPart part) : base(control, vm) {
+            this.part = part;
+            var tracksVm = vm.TracksViewModel;
+            if (!tracksVm.SelectedParts.Contains(part)) {
+                tracksVm.DeselectParts();
+            }
+        }
+        public override void Update(IPointer pointer, Point point) {
+            var project = DocManager.Inst.Project;
+            var tracksVm = vm.TracksViewModel;
+            tracksVm.PointToLineTick(point, out int left, out int right);
+
+            if (left < 0) { left = 0; }
+            int maxLeft = part.GetMaxPosTick(project);
+            left = Math.Min(left, maxLeft);
+
+            int offsetX = left - part.position;
+            if (offsetX == 0) { return; }
+
+            DocManager.Inst.ExecuteCmd(new SkipPartCommand(project, part, left, offsetX));
+        }
+    }
+    class WavPartResizeEditState : PartEditState {
+        public readonly UPart part;
+        public WavPartResizeEditState(Control control, MainWindowViewModel vm, UPart part) : base(control, vm) {
+            this.part = part;
+            var tracksVm = vm.TracksViewModel;
+            if (!tracksVm.SelectedParts.Contains(part)) {
+                tracksVm.DeselectParts();
+            }
+        }
+        public override void Update(IPointer pointer, Point point) {
+            var project = DocManager.Inst.Project;
+            var tracksVm = vm.TracksViewModel;
+            tracksVm.PointToLineTick(point, out int left, out int right);
+            int deltaDuration = right - part.End;
+
+            if (deltaDuration < 0) {
+                int maxDurReduction = part.Duration - part.GetMinDurTick(project);
+                deltaDuration = Math.Max(deltaDuration, -maxDurReduction);
+            }
+
+            if (deltaDuration == 0) { return; }
+            DocManager.Inst.ExecuteCmd(new ResizeWavPartCommand(project, part, deltaDuration));
+        }
+    }
+    class WavPartSkipEditState : PartEditState {
+        public readonly UPart part;
+        public WavPartSkipEditState(Control control, MainWindowViewModel vm, UPart part) : base(control, vm) {
+            this.part = part;
+            var tracksVm = vm.TracksViewModel;
+            if (!tracksVm.SelectedParts.Contains(part)) {
+                tracksVm.DeselectParts();
+            }
+        }
+        public override void Update(IPointer pointer, Point point) {
+            var project = DocManager.Inst.Project;
+            var tracksVm = vm.TracksViewModel;
+            tracksVm.PointToLineTick(point, out int left, out int right);
+
+            if (left < 0) { left = 0; }
+            int maxLeft = part.GetMaxPosTick(project);
+            left = Math.Min(left, maxLeft);
+
+            int offsetX = left - part.position;
+            if (offsetX == 0) { return; }
+
+            DocManager.Inst.ExecuteCmd(new SkipWavPartCommand(project, part, left, offsetX));
+        }
+    }
 
     class PartEraseEditState : PartEditState {
         public override MouseButton MouseButton => MouseButton.Right;
