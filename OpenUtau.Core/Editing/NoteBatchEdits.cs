@@ -365,6 +365,113 @@ namespace OpenUtau.Core.Editing {
             });
         }
     }
+    public class LoadRenderedPitchForSelectedNote : BatchEdit {
+        public virtual string Name => name;
+
+        public bool IsAsync => true;
+
+        private string name;
+
+        public LoadRenderedPitchForSelectedNote() {
+            name = "pianoroll.menu.notes.loadrenderedpitchforSelectedNote";
+        }
+
+        public void Run(UProject project, UVoicePart part, List<UNote> selectedNotes, DocManager docManager) {
+            RunAsync(
+                project, part, selectedNotes, docManager,
+                (current, total) => { }, CancellationToken.None);
+        }
+
+        public void RunAsync(
+            UProject project, UVoicePart part, List<UNote> selectedNotes, DocManager docManager,
+            Action<int, int> setProgressCallback, CancellationToken cancellationToken) {
+            var renderer = project.tracks[part.trackNo].RendererSettings.Renderer;
+            if (renderer == null || !renderer.SupportsRenderPitch) {
+                docManager.ExecuteCmd(new ErrorMessageNotification("Not supported"));
+                return;
+            }
+            var notes = selectedNotes.Count > 0 ? selectedNotes : part.notes.ToList();
+            List<UNote> adjustNotes = new List<UNote>();
+            if (selectedNotes.Count > 0) {
+                foreach (var note in selectedNotes) {
+                    var preNote = note.Prev;
+                    if (preNote != null && preNote.End == note.position) {
+                        if (!adjustNotes.Contains(preNote)) {
+                            adjustNotes.Add(preNote);
+                        }
+                    }
+                    if (!adjustNotes.Contains(note)) {
+                        adjustNotes.Add(note);
+                    }
+                    var nextNote = note.Next;
+                    if (nextNote != null && nextNote.position == note.End) {
+                        if (!adjustNotes.Contains(nextNote)) {
+                            adjustNotes.Add(nextNote);
+                        }
+                    }
+                }
+            }
+            var positions = notes.Select(n => n.position + part.position).ToHashSet();
+            var phrases = part.renderPhrases.Where(phrase => phrase.notes.Any(n => positions.Contains(phrase.position + n.position))).ToArray();
+            float minPitD = -1200;
+            if (project.expressions.TryGetValue(Format.Ustx.PITD, out var descriptor)) {
+                minPitD = descriptor.min;
+            }
+
+            int finished = 0;
+            setProgressCallback(0, phrases.Length);
+            var commands = new List<SetCurveCommand>();
+            foreach (var phrase in phrases) {
+                var result = renderer.LoadRenderedPitch(phrase);
+                if (result == null) {
+                    continue;
+                }
+                int? lastX = null;
+                int? lastY = null;
+                // TODO: Optimize interpolation and command.
+                if (cancellationToken.IsCancellationRequested) break;
+                for (int i = 0; i < result.tones.Length; i++) {
+                    if (result.tones[i] < 0) {
+                        continue;
+                    }
+                    int x = phrase.position - part.position + (int)result.ticks[i];
+                    int pitchIndex = Math.Clamp((x - (phrase.position - part.position - phrase.leading)) / 5, 0, phrase.pitches.Length - 1);
+                    float basePitch = phrase.pitchesBeforeDeviation[pitchIndex];
+                    int y = (int)(result.tones[i] * 100 - basePitch);
+                    lastX ??= x;
+                    lastY ??= y;
+                    if (selectedNotes.Count > 0) {
+                        bool canAdjust = false;
+                        foreach (var note in adjustNotes) {
+                            if (x > note.position && x < note.End) {
+                                canAdjust = true;
+                                break;
+                            }
+                        }
+                        if (!canAdjust) {
+                            lastX = x;
+                            lastY = y;
+                            continue;
+                        }
+                    }
+                    if (y > minPitD) {
+                        commands.Add(new SetCurveCommand(
+                            project, part, Format.Ustx.PITD, x, y, lastX.Value, lastY.Value));
+                    }
+                    lastX = x;
+                    lastY = y;
+                }
+                finished += 1;
+                setProgressCallback(finished, phrases.Length);
+            }
+
+            DocManager.Inst.PostOnUIThread(() => {
+                docManager.StartUndoGroup(true);
+                commands.ForEach(docManager.ExecuteCmd);
+                docManager.EndUndoGroup();
+            });
+        }
+    }
 
     public class BakePitch: BatchEdit {
         public virtual string Name => name;
