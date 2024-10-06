@@ -133,6 +133,16 @@ namespace OpenUtau.App.ViewModels {
         private readonly object portraitLock = new object();
         private int userSnapDiv = -2;
 
+        private int _wavShapeBorderHeight = 60;
+        [Reactive] public int WavShapeBorderHeight {
+            get => _wavShapeBorderHeight;
+            set {
+                if (_wavShapeBorderHeight != value) {
+                    _wavShapeBorderHeight = Math.Clamp(value, 60, 300);
+                }
+            }
+        }
+
         public NotesViewModel() {
             SnapDivs = new List<MenuItemViewModel>();
             SetSnapUnitCommand = ReactiveCommand.Create<int>(div => {

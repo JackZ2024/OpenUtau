@@ -963,7 +963,14 @@ namespace OpenUtau.App.Views {
             var position = args.GetCurrentPoint(control).Position;
             var size = control.Bounds.Size;
             var delta = args.Delta;
-            if (args.KeyModifiers == KeyModifiers.None || args.KeyModifiers == KeyModifiers.Shift) {
+            if (args.KeyModifiers == (cmdKey | KeyModifiers.Shift) && ViewModel.NotesViewModel.ShowWaveform) {
+                if (delta.Y > 0) {
+                    ViewModel.NotesViewModel.WavShapeBorderHeight = Math.Clamp(ViewModel.NotesViewModel.WavShapeBorderHeight + 10, 60, 300);
+                } else if (delta.Y < 0) {
+                    ViewModel.NotesViewModel.WavShapeBorderHeight = Math.Clamp(ViewModel.NotesViewModel.WavShapeBorderHeight - 10, 60, 300);
+                }
+            }
+            else if(args.KeyModifiers == KeyModifiers.None || args.KeyModifiers == KeyModifiers.Shift) {
                 if (args.KeyModifiers == KeyModifiers.Shift) {
                     delta = new Vector(delta.Y, delta.X);
                 }
