@@ -265,7 +265,7 @@ namespace OpenUtau.Core.Analysis.Some {
                         var durTick = timeAxis.MsPosToTickPos(currMs + noteDurMs) - posTick;
                         var note = project.CreateNote(
                             (int)Math.Round(note_midi[index]),
-                            posTick - wavePart.position,
+                            posTick - wavePart.position - wavePart.skipTicks,
                             durTick
                         );
                         part.notes.Add(note);

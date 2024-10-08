@@ -91,7 +91,7 @@ namespace OpenUtau.Core.Render {
                         var waveSource = new WaveSource(
                             offsetMs,
                             estimatedLengthMs,
-                            skipMs, part.channels);
+                            skipMs, part.channels, true);
                         waveSource.SetSamples(part.Samples);
                         return (ISignalSource)waveSource;
                     }));

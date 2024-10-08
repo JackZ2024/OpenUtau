@@ -96,8 +96,8 @@ namespace OpenUtau.App.Controls {
                             int endSample = Math.Clamp((int)((endMs - leftMs) * 44100 / 1000) * 2, 0, sampleCount);
                             if (endSample > startSample) {
                                 var segment = new ArraySegment<float>(sampleData, startSample, endSample - startSample);
-                                float min = 0.5f + segment.Min() * 0.5f;
-                                float max = 0.5f + segment.Max() * 0.5f;
+                                float min = 0.5f + segment.Min() * 0.7f;
+                                float max = 0.5f + segment.Max() * 0.7f;
                                 float yMax = Math.Clamp(max * bitmap.PixelSize.Height, 0, bitmap.PixelSize.Height - 1);
                                 float yMin = Math.Clamp(min * bitmap.PixelSize.Height, 0, bitmap.PixelSize.Height - 1);
                                 DrawPeak(bitmapData, bitmap.PixelSize.Width, i, (int)Math.Round(yMin), (int)Math.Round(yMax));

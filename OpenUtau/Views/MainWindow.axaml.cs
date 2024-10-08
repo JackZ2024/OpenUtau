@@ -1134,6 +1134,9 @@ namespace OpenUtau.App.Views {
                 partEditState.Update(point.Pointer, point.Position);
             }
         }
+        public void TrackCanvasPointerMoved(object sender, PointerEventArgs args) {
+            Cursor = null;
+        }
 
         public void PartsContextMenuOpening(object sender, CancelEventArgs args) {
             if (shouldOpenPartsContextMenu) {

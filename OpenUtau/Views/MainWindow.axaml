@@ -190,6 +190,7 @@
                              DataContext="{Binding TracksViewModel}"
                              TrackHeight="{Binding TrackHeight}"
                              TrackOffset="{Binding TrackOffset}"
+                             PointerMoved="TrackCanvasPointerMoved"
                              Items="{Binding Tracks}"/>
         <c:TrackBackground Grid.Row="2" Grid.Column="1" Margin="0" IsHitTestVisible="False"
                            Foreground="{DynamicResource TrackBackgroundAltBrush}"

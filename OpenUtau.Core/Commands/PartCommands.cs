@@ -1,5 +1,4 @@
-﻿using System;
-using OpenUtau.Core.Ustx;
+﻿using OpenUtau.Core.Ustx;
 
 namespace OpenUtau.Core {
     public abstract class PartCommand : UCommand {

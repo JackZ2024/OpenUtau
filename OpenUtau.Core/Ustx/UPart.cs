@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Melanchall.DryWetMidi.MusicTheory;
 using NWaves.Operations;
 using NWaves.Signals;
 using OpenUtau.Api;

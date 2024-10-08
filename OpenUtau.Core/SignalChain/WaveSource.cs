@@ -8,6 +8,7 @@ namespace OpenUtau.Core.SignalChain {
         public readonly int offset;
         public readonly int estimatedLength;
         public readonly int channels;
+        public readonly bool isWavePart;
 
         public double EndMs => offsetMs + estimatedLengthMs;
         public bool HasSamples => data != null;
@@ -15,13 +16,14 @@ namespace OpenUtau.Core.SignalChain {
         private readonly object lockObj = new object();
         private float[] data;
 
-        public WaveSource(double offsetMs, double estimatedLengthMs, double skipOverMs, int channels) {
+        public WaveSource(double offsetMs, double estimatedLengthMs, double skipOverMs, int channels, bool isWavePart=false) {
             this.offsetMs = offsetMs;
             this.skipData = (int)((skipOverMs) * 44100 / 1000) * channels;
             this.estimatedLengthMs = estimatedLengthMs;
             this.channels = channels;
             offset = (int)((offsetMs) * 44100 / 1000) * channels;
             estimatedLength = (int)(estimatedLengthMs * 44100 / 1000) * channels;
+            this.isWavePart = isWavePart;
         }
 
         public void SetSamples(float[] samples) {
@@ -46,7 +48,10 @@ namespace OpenUtau.Core.SignalChain {
                 return position;
             }
             int start = Math.Max(position, offset * copies);
-            int end = Math.Min(position + count, offset * copies + estimatedLength * copies);
+            int end = Math.Min(position + count, offset * copies + data.Length * copies);
+            if (isWavePart) {
+                end = Math.Min(position + count, offset * copies + estimatedLength * copies);
+            }
             for (int i = start; i < end; ++i) {
                 int dataIndex = i / copies - offset + this.skipData;
                 if (dataIndex < 0 || dataIndex >= data.Length) {
