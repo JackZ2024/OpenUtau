@@ -270,6 +270,17 @@
             </ComboBox>
           </StackPanel>
         </HeaderedContentControl>
+        <HeaderedContentControl Classes="groupbox" Header="{DynamicResource prefs.audio2midi}">
+            <StackPanel>
+                <Grid>
+                    <TextBlock Text="{DynamicResource prefs.audio2midi.enablegetlyric}" HorizontalAlignment="Left"/>
+                    <ToggleSwitch IsChecked="{Binding EnableGetLyricModule}" HorizontalAlignment="Center"/>
+                    <Button Grid.Column="4" Content="{DynamicResource prefs.audio2midi.downloadGetLyricMoudle}"
+                            IsEnabled="{Binding EnableGetLyricModuleButton}"
+                            HorizontalAlignment="Right" Click="DownloadGetLyricModule"/>
+                </Grid>
+            </StackPanel>
+        </HeaderedContentControl>
       </StackPanel>
     </ScrollViewer>
   </Grid>
