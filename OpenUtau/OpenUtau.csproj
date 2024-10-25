@@ -6,7 +6,7 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -48,7 +48,7 @@
             </dict>
         </array>          
   </CFBundleDocumentTypes>
-    <AssemblyVersion>0.1.543.11</AssemblyVersion>
+    <AssemblyVersion>0.1.543.12</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
@@ -111,6 +111,9 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Views\KeySignatureDialog.axaml.cs">
+      <DependentUpon>KeySignatureDialog.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\PasteParamDialog.axaml.cs">
       <DependentUpon>PasteParamDialog.axaml</DependentUpon>

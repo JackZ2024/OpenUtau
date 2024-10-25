@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using OpenUtau.App.ViewModels;
 using OpenUtau.Core;
 using OpenUtau.Core.Util;
 using ReactiveUI;
@@ -52,10 +53,18 @@ namespace OpenUtau.App.Controls {
         private double _trackOffset;
         private bool _isPianoRoll;
         private bool _isKeyboard;
+        private int _tick;
 
         public TrackBackground() {
             MessageBus.Current.Listen<ThemeChangedEvent>()
                 .Subscribe(e => InvalidateVisual());
+            MessageBus.Current.Listen<SeekPlayPosChangedEvent>()
+                .Subscribe(e => {
+                    if (_tick != e.curTick) {
+                        _tick = e.curTick;
+                        InvalidateVisual();
+                    } 
+                });
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change) {
@@ -77,7 +86,7 @@ namespace OpenUtau.App.Controls {
             }
             int track = (int)TrackOffset;
             double top = TrackHeight * (track - TrackOffset);
-            int key = DocManager.Inst.Project == null ? 0 : DocManager.Inst.Project.key;
+            int key = DocManager.Inst.Project == null ? 0 : DocManager.Inst.Project.GetCurKey(_tick);
             string[] degreeNames;
             switch(Preferences.Default.DegreeStyle){
                 case 1:

@@ -31,6 +31,17 @@ namespace OpenUtau.Core.Ustx {
         }
         public override string ToString() => $"{beatPerBar}/{beatUnit}@bar{barPosition}";
     }
+    public class UKey {
+        public int position;
+        public int key;
+
+        public UKey() { }
+        public UKey(int position, int key) {
+            this.position = position;
+            this.key = key;
+        }
+        public override string ToString() => $"{key}@{position}";
+    }
 
     public class UProject {
         public string name = "New Project";
@@ -49,9 +60,10 @@ namespace OpenUtau.Core.Ustx {
         public string[] expSelectors = new string[] { Format.Ustx.DYN, Format.Ustx.PITD, Format.Ustx.CLR, Format.Ustx.ENG, Format.Ustx.VEL };
         public int expPrimary = 0;
         public int expSecondary = 1;
-        public int key = 0;//Music key of the project, 0 = C, 1 = C#, 2 = D, ..., 11 = B
+        //public int key = 0;//Music key of the project, 0 = C, 1 = C#, 2 = D, ..., 11 = B
         public List<UTimeSignature> timeSignatures;
         public List<UTempo> tempos;
+        public List<UKey> keys; //Music key of the project, 0 = C, 1 = C#, 2 = D, ..., 11 = B
         public List<UTrack> tracks;
         [YamlIgnore] public List<UPart> parts;
         [YamlIgnore] public bool SoloTrackExist { get => tracks.Any(t => t.Solo); }
@@ -74,6 +86,7 @@ namespace OpenUtau.Core.Ustx {
         public UProject() {
             timeSignatures = new List<UTimeSignature> { new UTimeSignature(0, 4, 4) };
             tempos = new List<UTempo> { new UTempo(0, 120) };
+            keys = new List<UKey> { new UKey(0, 0) };
             tracks = new List<UTrack>() { new UTrack("Track1") };
             parts = new List<UPart>();
             timeAxis.BuildSegments(this);
@@ -130,6 +143,29 @@ namespace OpenUtau.Core.Ustx {
             note.position = posTick;
             note.duration = durTick;
             return note;
+        }
+
+        public int GetCurKey(int tick) {
+            int curKey = 0;
+            foreach(var key in keys) {
+                if (key.position > tick) {
+                    break;
+                } else {
+                    curKey = key.key;
+                }
+            }
+            return curKey;
+        }
+        public void UpdateKey(int tick, int value) {
+            UKey curKey = keys[0];
+            foreach (var key in keys) {
+                if (key.position > tick) {
+                    break;
+                } else {
+                    curKey = key;
+                }
+            }
+            curKey.key = value;
         }
 
         public void BeforeSave() {

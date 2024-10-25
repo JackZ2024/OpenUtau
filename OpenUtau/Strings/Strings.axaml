@@ -22,6 +22,8 @@
   <system:String x:Key="context.timeline.addtimesig">Add time signature change</system:String>
   <system:String x:Key="context.timeline.deltempo">Delete tempo change at {0}</system:String>
   <system:String x:Key="context.timeline.deltimesig">Delete time signature change</system:String>
+  <system:String x:Key="context.timeline.delkey">Delete Key Signature</system:String>
+  <system:String x:Key="context.timeline.addkey">Add Key Signature</system:String>
 
   <system:String x:Key="debug.clear">Clear</system:String>
   <system:String x:Key="debug.copylog">Copy Log</system:String>

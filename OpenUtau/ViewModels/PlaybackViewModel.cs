@@ -7,12 +7,18 @@ using ReactiveUI;
 
 namespace OpenUtau.App.ViewModels {
     public class TimeAxisChangedEvent { }
+    public class SeekPlayPosChangedEvent {
+        public readonly int curTick;
+        public SeekPlayPosChangedEvent(int tick) {
+            curTick = tick;
+        }
+    }
     public class PlaybackViewModel : ViewModelBase, ICmdSubscriber {
         UProject Project => DocManager.Inst.Project;
         public int BeatPerBar => Project.timeSignatures[0].beatPerBar;
         public int BeatUnit => Project.timeSignatures[0].beatUnit;
         public double Bpm => Project.tempos[0].bpm;
-        public int Key => Project.key;
+        public int Key => Project.keys[0].key;
         public string KeyName => MusicMath.KeysInOctave[Key].Item1;
         public int Resolution => Project.resolution;
         public int PlayPosTick => DocManager.Inst.playPosTick;
@@ -25,10 +31,12 @@ namespace OpenUtau.App.ViewModels {
         public void SeekStart() {
             Pause();
             DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(0));
+            MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(0));
         }
         public void SeekEnd() {
             Pause();
             DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(Project.EndTick));
+            MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(Project.EndTick));
         }
         public void PlayOrPause(int tick = -1, int endTick = -1, int trackNo = -1) {
             MetronomePlayer.Instance.UpdateParmas((int)Project.tempos[0].bpm, Project.timeSignatures[0].beatPerBar, Project.timeSignatures[0].beatUnit);
@@ -36,6 +44,7 @@ namespace OpenUtau.App.ViewModels {
             var lockStartTime = Convert.ToBoolean(Preferences.Default.LockStartTime);
             if (!PlaybackManager.Inst.Playing && !PlaybackManager.Inst.StartingToPlay && lockStartTime) {
                 DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(PlaybackManager.Inst.StartTick, true));
+                MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(Math.Max(0, tick)));
             }
         }
         public void Pause() {
@@ -45,6 +54,7 @@ namespace OpenUtau.App.ViewModels {
         public void MovePlayPos(int tick) {
             if (DocManager.Inst.playPosTick != tick) {
                 DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(Math.Max(0, tick)));
+                MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(Math.Max(0, tick)));
             }
         }
 
@@ -66,11 +76,12 @@ namespace OpenUtau.App.ViewModels {
         }
 
         public void SetKey(int key) {
-            if (key == DocManager.Inst.Project.key) {
+            if (key == DocManager.Inst.Project.GetCurKey(PlayPosTick)) {
                 return;
             }
+
             DocManager.Inst.StartUndoGroup();
-            DocManager.Inst.ExecuteCmd(new KeyCommand(Project, key));
+            DocManager.Inst.ExecuteCmd(new KeyCommand(Project, key, PlayPosTick));
             DocManager.Inst.EndUndoGroup();
         }
 
@@ -81,6 +92,8 @@ namespace OpenUtau.App.ViewModels {
                 cmd is DelTempoChangeCommand ||
                 cmd is AddTimeSigCommand ||
                 cmd is DelTimeSigCommand ||
+                cmd is AddKeyChangeCommand ||
+                cmd is DelKeyChangeCommand ||
                 cmd is KeyCommand ||
                 cmd is LoadProjectNotification) {
                 this.RaisePropertyChanged(nameof(BeatPerBar));

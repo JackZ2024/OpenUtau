@@ -153,9 +153,10 @@ namespace OpenUtau.App.ViewModels {
             Keys = new List<MenuItemViewModel>();
             SetKeyCommand = ReactiveCommand.Create<int>(key => {
                 DocManager.Inst.StartUndoGroup();
-                DocManager.Inst.ExecuteCmd(new KeyCommand(Project, key));
+                DocManager.Inst.ExecuteCmd(new KeyCommand(Project, key, DocManager.Inst.playPosTick));
                 DocManager.Inst.EndUndoGroup();
                 UpdateKey();
+                MessageBus.Current.SendMessage(new PianorollRefreshEvent("Part"));
             });
 
             viewportTicks = this.WhenAnyValue(x => x.Bounds, x => x.TickWidth)
@@ -366,7 +367,7 @@ namespace OpenUtau.App.ViewModels {
         }
 
         private void UpdateKey(){
-            int key = Project.key;
+            int key = Project.GetCurKey(DocManager.Inst.playPosTick);
             KeyText = "1="+MusicMath.KeysInOctave[key].Item1;
         }
 

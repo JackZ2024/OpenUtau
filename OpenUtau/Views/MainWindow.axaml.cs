@@ -41,6 +41,7 @@ namespace OpenUtau.App.Views {
         private readonly DispatcherTimer timer;
         private readonly DispatcherTimer autosaveTimer;
         private bool forceClose;
+        private int lastKey = 0;
 
         private bool shouldOpenPartsContextMenu;
 
@@ -61,6 +62,8 @@ namespace OpenUtau.App.Views {
                 viewModel.DelTempoChangeCmd = ReactiveCommand.Create<int>(tick => DelTempoChange(tick));
                 viewModel.AddTimeSigChangeCmd = ReactiveCommand.Create<int>(bar => AddTimeSigChange(bar));
                 viewModel.DelTimeSigChangeCmd = ReactiveCommand.Create<int>(bar => DelTimeSigChange(bar));
+                viewModel.AddKeyChangeCmd = ReactiveCommand.Create<int>(tick => AddKeyChange(tick));
+                viewModel.DelKeyChangeCmd = ReactiveCommand.Create<int>(tick => DelKeyChange(tick));
 
                 Splash.IsEnabled = false;
                 Splash.IsVisible = false;
@@ -148,9 +151,26 @@ namespace OpenUtau.App.Views {
             DocManager.Inst.ExecuteCmd(new DelTempoChangeCommand(project, tick));
             DocManager.Inst.EndUndoGroup();
         }
+        private void AddKeyChange(int tick) {
+            var project = DocManager.Inst.Project;
+            var dialog = new KeySignatureDialog(lastKey);
+            dialog.OnOk = (key) => {
+                lastKey = key;
+                DocManager.Inst.StartUndoGroup();
+                DocManager.Inst.ExecuteCmd(new AddKeyChangeCommand(project, tick, key));
+                DocManager.Inst.EndUndoGroup();
+            };
+            dialog.ShowDialog(this);
+        }
 
-        
-        
+        private void DelKeyChange(int tick) {
+            var project = DocManager.Inst.Project;
+            DocManager.Inst.StartUndoGroup();
+            DocManager.Inst.ExecuteCmd(new DelKeyChangeCommand(project, tick));
+            DocManager.Inst.EndUndoGroup();
+        }
+
+
         void OnMenuRemapTimeaxis(object sender, RoutedEventArgs e){
             var project = DocManager.Inst.Project;
             var dialog = new TypeInDialog {

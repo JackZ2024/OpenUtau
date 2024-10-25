@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using OpenUtau.App.ViewModels;
+using OpenUtau.Core;
 using ReactiveUI;
 
 namespace OpenUtau.App.Controls {
@@ -195,6 +196,20 @@ namespace OpenUtau.App.Controls {
                 double x = Math.Round(tick * TickWidth - pixelOffset) + 0.5 + barTextLayout.Width + 4;
                 var textLayout = TextLayoutCache.Get($"{timeSig.beatPerBar}/{timeSig.beatUnit}", ThemeManager.BarNumberBrush, 10);
                 using (var state = context.PushTransform(Matrix.CreateTranslation(x + 3, 10))) {
+                    textLayout.Draw(context, new Point());
+                }
+            }
+
+            foreach (var key in project.keys) {
+                project.timeAxis.TickPosToBarBeat(key.position, out int timebar, out int _, out int _);
+                int index = project.timeSignatures.FindIndex(time => time.barPosition == timebar);
+                int offset = 30;
+                if (index == -1) { offset = 10; }
+                double x = Math.Round(key.position * TickWidth - pixelOffset) + 0.5;
+                context.DrawLine(penDanshed, new Point(x, 0), new Point(x, 24));
+                var text = MusicMath.KeysInOctave[key.key].Item1;
+                var textLayout = TextLayoutCache.Get(text, ThemeManager.BarNumberBrush, 13);
+                using (var state = context.PushTransform(Matrix.CreateTranslation(x + offset, 8))) {
                     textLayout.Draw(context, new Point());
                 }
             }

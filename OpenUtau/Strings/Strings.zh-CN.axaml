@@ -22,6 +22,8 @@
   <system:String x:Key="context.timeline.addtimesig">添加节拍标签</system:String>
   <system:String x:Key="context.timeline.deltempo">删除位于 {0} 的曲速标签</system:String>
   <system:String x:Key="context.timeline.deltimesig">删除节拍标签</system:String>
+  <system:String x:Key="context.timeline.delkey">删除调号标签</system:String>
+  <system:String x:Key="context.timeline.addkey">添加调号标签</system:String>
 
   <system:String x:Key="debug.clear">清空</system:String>
   <system:String x:Key="debug.copylog">复制日志</system:String>

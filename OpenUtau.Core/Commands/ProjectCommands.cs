@@ -67,6 +67,52 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => $"Del tempo change {bpm} at {tick}";
     }
+    public class AddKeyChangeCommand : ProjectCommand {
+        protected int tick;
+        protected int key;
+        public AddKeyChangeCommand(UProject project, int tick, int key) : base(project) {
+            this.tick = tick;
+            this.key = key;
+        }
+        protected AddKeyChangeCommand(UProject project) : base(project) { }
+        public override void Execute() {
+            var firstKey = project.keys.FirstOrDefault(key => key.position > tick);
+            var newKey = new UKey {
+                position = tick,
+                key = this.key,
+            };
+            if (firstKey == null) {
+                project.keys.Add(newKey);
+            } else {
+                int index = project.keys.IndexOf(firstKey);
+                project.keys.Insert(index, newKey);
+            }
+        }
+        public override void Unexecute() {
+            int index = project.keys.FindIndex(key => key.position == tick);
+            if (index >= 0) {
+                project.keys.RemoveAt(index);
+            } else {
+                throw new Exception("Cannot remove non-exist tempo change.");
+            }
+        }
+        public override string ToString() => $"Add Key change {key} at {tick}";
+    }
+
+    public class DelKeyChangeCommand : AddKeyChangeCommand {
+        public DelKeyChangeCommand(UProject project, int tick) : base(project) {
+            this.tick = tick;
+            var delKey = project.keys.Find(key => key.position == tick);
+            key = delKey.key;
+        }
+        public override void Execute() {
+            base.Unexecute();
+        }
+        public override void Unexecute() {
+            base.Execute();
+        }
+        public override string ToString() => $"Del tempo change {key} at {tick}";
+    }
 
     public class AddTimeSigCommand : ProjectCommand {
         protected int bar;
@@ -143,13 +189,19 @@ namespace OpenUtau.Core {
     public class KeyCommand : ProjectCommand{
         public readonly int oldKey;
         public readonly int newKey;
-        public KeyCommand(UProject project, int key) : base(project) {
-            oldKey = project.key;
+        public readonly int tick;
+        public KeyCommand(UProject project, int key, int tick) : base(project) {
+            this.tick = tick;
+            oldKey = project.GetCurKey(tick);
             newKey = key;
         }
         public override string ToString() => $"Change key from {oldKey} to {newKey}";
-        public override void Execute() => project.key = newKey;
-        public override void Unexecute() => project.key = oldKey;
+        public override void Execute() {
+            project.UpdateKey(tick, newKey);
+        }
+        public override void Unexecute() {
+            project.UpdateKey(tick, oldKey);
+        }
     }
 
     public class ConfigureExpressionsCommand : ProjectCommand {

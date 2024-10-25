@@ -48,6 +48,8 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<int, Unit>? DelTempoChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? AddTimeSigChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? DelTimeSigChangeCmd { get; set; }
+        public ReactiveCommand<int, Unit>? AddKeyChangeCmd { get; set; }
+        public ReactiveCommand<int, Unit>? DelKeyChangeCmd { get; set; }
 
         private ObservableCollectionExtended<MenuItemViewModel> openRecent
             = new ObservableCollectionExtended<MenuItemViewModel>();
@@ -269,6 +271,21 @@ namespace OpenUtau.App.ViewModels {
                 TimelineContextMenuItems.Add(new MenuItemViewModel {
                     Header = string.Format(template, left),
                     Command = AddTempoChangeCmd,
+                    CommandParameter = left,
+                });
+            }
+
+            var key = project.keys.LastOrDefault(k => k.position < tick);
+            if (key != null && key.position > 0 && (tick - key.position) * TracksViewModel.TickWidth < 40) {
+                TimelineContextMenuItems.Add(new MenuItemViewModel {
+                    Header = ThemeManager.GetString("context.timeline.delkey"),
+                    Command = DelKeyChangeCmd,
+                    CommandParameter = key.position,
+                });
+            } else if(key != null && (tick - key.position) * TracksViewModel.TickWidth > 40) {
+                TimelineContextMenuItems.Add(new MenuItemViewModel {
+                    Header = ThemeManager.GetString("context.timeline.addkey"),
+                    Command = AddKeyChangeCmd,
                     CommandParameter = left,
                 });
             }
