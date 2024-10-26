@@ -190,7 +190,10 @@
                              DataContext="{Binding TracksViewModel}"
                              TrackHeight="{Binding TrackHeight}"
                              TrackOffset="{Binding TrackOffset}"
-                             PointerMoved="TrackCanvasPointerMoved"
+                             PointerPressed="TrackHeaderCanvasPointerPressed"
+                             PointerMoved="TrackHeaderCanvasPointerMoved"
+                             PointerReleased="TrackHeaderCanvasPointerReleased"
+                             PointerWheelChanged="TrackHeaderCanvasPointerWheelChanged"
                              Items="{Binding Tracks}"/>
         <c:TrackBackground Grid.Row="2" Grid.Column="1" Margin="0" IsHitTestVisible="False"
                            Foreground="{DynamicResource TrackBackgroundAltBrush}"
@@ -270,6 +273,13 @@
         <ProgressBar Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Value="{Binding Progress}"/>
       </Grid>
     </Grid>
+    <Canvas Name="ValueTipCanvas" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" IsHitTestVisible="False">
+        <Border Name="ValueTip" BorderThickness="1"
+                BorderBrush="{DynamicResource NeutralAccentBrush}"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+            <TextBlock Name="ValueTipText" Margin="2"/>
+        </Border>
+    </Canvas>
     <Border Name="Splash">
       <TextBlock Text="{DynamicResource progress.loadingsingers}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
     </Border>

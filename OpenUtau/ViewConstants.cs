@@ -30,6 +30,7 @@ namespace OpenUtau.App {
         public static readonly Cursor cursorSizeAll = new Cursor(StandardCursorType.SizeAll);
         public static readonly Cursor cursorSizeNS = new Cursor(StandardCursorType.SizeNorthSouth);
         public static readonly Cursor cursorSizeWE = new Cursor(StandardCursorType.SizeWestEast);
+        public static readonly Cursor cursorDragMove = new Cursor(StandardCursorType.DragMove);
 
         public const int PosMarkerHightlighZIndex = -100;
 

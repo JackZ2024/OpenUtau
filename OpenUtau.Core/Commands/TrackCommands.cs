@@ -87,6 +87,38 @@ namespace OpenUtau.Core {
         }
     }
 
+    public class AdjustTrackCommand : TrackCommand {
+        public int oldIndex;
+        public int index;
+        public AdjustTrackCommand(UProject project, UTrack track, int index) {
+            this.project = project;
+            this.track = track;
+            this.oldIndex = track.TrackNo;
+            this.index = index;
+        }
+        public override string ToString() => "Adjust track";
+        public override void Execute() {
+            project.tracks.RemoveAt(oldIndex);
+            if (oldIndex > index) {
+                oldIndex = oldIndex + 1;
+            } else {
+                index = index - 1;
+            }
+            project.tracks.Insert(index, track);
+            UpdateTrackNo();
+        }
+        public override void Unexecute() {
+            project.tracks.RemoveAt(index);
+            if (index > oldIndex) {
+                index = index + 1;
+            } else {
+                oldIndex = oldIndex - 1;
+            }
+            project.tracks.Insert(oldIndex, track);
+            UpdateTrackNo();
+        }
+    }
+
     public class RenameTrackCommand : TrackCommand {
         readonly string newName, oldName;
         public RenameTrackCommand(UProject project, UTrack track, string name) {

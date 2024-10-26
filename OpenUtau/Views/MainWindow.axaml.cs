@@ -44,6 +44,10 @@ namespace OpenUtau.App.Views {
         private int lastKey = 0;
 
         private bool shouldOpenPartsContextMenu;
+        private bool headerLeftBtnDown = false;
+        private bool headerStartDrop = false;
+
+        private Point valueTipPointerPosition;
 
         private readonly ReactiveCommand<UPart, Unit> PartRenameCommand;
         private readonly ReactiveCommand<UPart, Unit> PartGotoFileCommand;
@@ -55,6 +59,7 @@ namespace OpenUtau.App.Views {
             InitializeComponent();
             Log.Information("Initialized main window component.");
             DataContext = viewModel = new MainWindowViewModel();
+            ValueTip.IsVisible = false;
             var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
             viewModel.GetInitSingerTask()!.ContinueWith(_ => {
                 viewModel.InitProject();
@@ -162,14 +167,12 @@ namespace OpenUtau.App.Views {
             };
             dialog.ShowDialog(this);
         }
-
         private void DelKeyChange(int tick) {
             var project = DocManager.Inst.Project;
             DocManager.Inst.StartUndoGroup();
             DocManager.Inst.ExecuteCmd(new DelKeyChangeCommand(project, tick));
             DocManager.Inst.EndUndoGroup();
         }
-
 
         void OnMenuRemapTimeaxis(object sender, RoutedEventArgs e){
             var project = DocManager.Inst.Project;
@@ -759,6 +762,37 @@ namespace OpenUtau.App.Views {
                 pianoRollWindow.Height = (y != null ? wa.Size.Height - (Height + titleBarHeight) : wa.Size.Height) - titleBarHeight;
             }
         }
+        void ShowValueTip() {
+            if (ValueTip != null) {
+                ValueTip.IsVisible = true;
+            }
+        }
+        void HideValueTip() {
+            if (ValueTip != null) {
+                ValueTip.IsVisible = false;
+            }
+            if (ValueTipText != null) {
+                ValueTipText.Text = string.Empty;
+            }
+        }
+        void UpdateValueTip(string text) {
+            if (ValueTip == null || ValueTipText == null || ValueTipCanvas == null) {
+                return;
+            }
+            ValueTipText.Text = text;
+            UpdateValueTipPosition();
+        }
+        void UpdateValueTipPosition() {
+            if (ValueTip == null || ValueTipText == null || ValueTipCanvas == null) {
+                return;
+            }
+            Canvas.SetLeft(ValueTip, valueTipPointerPosition.X + 18);
+            double tipY = valueTipPointerPosition.Y + 16;
+            if (tipY + 21 > ValueTipCanvas!.Bounds.Height) {
+                tipY = tipY - 42;
+            }
+            Canvas.SetTop(ValueTip, tipY);
+        }
 
         void OnKeyDown(object sender, KeyEventArgs args) {
             if (!splashDone) {
@@ -1154,8 +1188,56 @@ namespace OpenUtau.App.Views {
                 partEditState.Update(point.Pointer, point.Position);
             }
         }
-        public void TrackCanvasPointerMoved(object sender, PointerEventArgs args) {
+        public void TrackHeaderCanvasPointerPressed(object sender, PointerPressedEventArgs args) {
+            var control = (Control)sender;
+            var point = args.GetCurrentPoint(control);
+            if (point.Properties.IsLeftButtonPressed) {
+                args.Pointer.Capture(control);
+                headerLeftBtnDown = true;
+            }
+        }
+        public void TrackHeaderCanvasPointerMoved(object sender, PointerEventArgs args) {
+            Console.WriteLine("TrackHeaderCanvasPointerMoved----");
+            if (ValueTipCanvas != null) {
+                valueTipPointerPosition = args.GetCurrentPoint(ValueTipCanvas!).Position;
+            }
+            if (headerLeftBtnDown) {
+                var control = (TrackHeaderCanvas)sender;
+                var point = args.GetCurrentPoint(control);
+                Cursor = ViewConstants.cursorDragMove;
+                if(headerStartDrop) {
+                    control.UpdateDrag(point.Position);
+                    UpdateValueTipPosition();
+                } else {
+                    var text = control.StartDrag(point.Position);
+                    ShowValueTip();
+                    UpdateValueTip(text);
+                    headerStartDrop = true;
+                }
+            } else {
+                Cursor = null;
+            }
+        }
+        public void TrackHeaderCanvasPointerReleased(object sender, PointerReleasedEventArgs args) {
+            if (headerLeftBtnDown) {
+                var control = (TrackHeaderCanvas)sender;
+                var point = args.GetCurrentPoint(control);
+                control.StopDrag(point.Position);
+                HideValueTip();
+                args.Pointer.Capture(null);
+                headerLeftBtnDown = false;
+                headerStartDrop = false;
+            }
             Cursor = null;
+        }
+        public void TrackHeaderCanvasPointerWheelChanged(object sender, PointerWheelEventArgs args) {
+            var delta = args.Delta;
+            if (headerStartDrop) {
+                if (delta.Y != 0) {
+                    VScrollBar.Value = Math.Max(VScrollBar.Minimum,
+                        Math.Min(VScrollBar.Maximum, VScrollBar.Value - VScrollBar.SmallChange * delta.Y));
+                }
+            }
         }
 
         public void PartsContextMenuOpening(object sender, CancelEventArgs args) {

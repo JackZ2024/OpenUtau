@@ -48,6 +48,10 @@ namespace OpenUtau.App.Controls {
         private Dictionary<UTrack, TrackHeader> trackHeaders = new Dictionary<UTrack, TrackHeader>();
         private TrackAdder? trackAdder;
 
+        private TrackHeader? curTrackHeader = null;
+        private TrackHeader? lastTrackHeader = null;
+        private UTrack? dragTrack = null;
+
         public TrackHeaderCanvas() {
             MessageBus.Current.Listen<TracksRefreshEvent>()
                 .Subscribe(_ => {
@@ -149,6 +153,89 @@ namespace OpenUtau.App.Controls {
                     }
                     break;
             }
+        }
+
+        public string StartDrag(Point point) {
+            lastTrackHeader = null;
+            dragTrack = null;
+            foreach (var (track, header) in trackHeaders) {
+                if(header.Bounds.Contains(point)) {
+                    curTrackHeader = header;
+                    dragTrack = track;
+                    break;
+                }
+            }
+
+            if (dragTrack != null) {
+                return dragTrack.TrackName;
+            }
+            return "";
+        }
+        public void UpdateDrag(Point point) {
+            bool inHeader = false;
+            foreach (var (track, header) in trackHeaders) {
+                if (header.Bounds.Contains(point)) {
+                    if(header != curTrackHeader) {
+                        lastTrackHeader = curTrackHeader;
+                        curTrackHeader = header;
+                        lastTrackHeader?.hideDragLine();
+
+                        if (point.Y > (curTrackHeader.Bounds.Top + (curTrackHeader.Bounds.Height / 2))) {
+                            curTrackHeader.showDragLine(false);
+                        } else {
+                            curTrackHeader.showDragLine(true);
+                        }
+                    } else {
+                        if (curTrackHeader != null) {
+                            if (point.Y > (curTrackHeader.Bounds.Top + (curTrackHeader.Bounds.Height / 2))) {
+                                curTrackHeader.showDragLine(false);
+                            } else {
+                                curTrackHeader.showDragLine(true);
+                            }
+                        }
+                    }
+                    inHeader = true;
+                    break;
+                }
+            }
+            if(!inHeader) {
+                curTrackHeader?.hideDragLine();
+                curTrackHeader = null;
+            }
+            //if (curTrackHeader != null && dragTrack != null) {
+            //    if (trackHeaders[dragTrack] == curTrackHeader) {
+            //        Cursor = ViewConstants.cursorNo;
+            //    }
+            //    else {
+            //        Cursor = ViewConstants.cursorDragMove;
+            //    }
+            //}
+        }
+        public void StopDrag(Point point) {
+            curTrackHeader?.hideDragLine();
+            if(dragTrack == null) { return; }
+            foreach (var (track, header) in trackHeaders) {
+                if (header.Bounds.Contains(point)) {
+                    int index = -1;
+                    if (point.Y > (header.Bounds.Top + (header.Bounds.Height / 2))) {
+                        index = track.TrackNo + 1;
+                    } else {
+                        index = track.TrackNo;
+                    }
+
+                    if(index == dragTrack.TrackNo || index == dragTrack.TrackNo + 1) {
+                        return;
+                    }
+
+                    DocManager.Inst.StartUndoGroup();
+                    DocManager.Inst.ExecuteCmd(new AdjustTrackCommand(DocManager.Inst.Project, dragTrack, index));
+                    DocManager.Inst.EndUndoGroup();
+                    break;
+                }
+            }
+            curTrackHeader = null;
+            lastTrackHeader = null;
+            dragTrack = null;
         }
 
         void Add(UTrack track) {

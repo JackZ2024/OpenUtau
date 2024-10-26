@@ -197,6 +197,14 @@
                  TextAlignment="Right" FontSize="9" FontFamily="monospace"
                  KeyDown="VolumeOrPanTextBoxKeyDown" LostFocus="VolumeOrPanTextBoxLostFocus"/>
       </Grid>
+      <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" VerticalAlignment="Top"
+            Height="2" Background="{DynamicResource DragSplitLineColor}" 
+            IsVisible="{Binding showTopLine, Mode=OneWay}">
+      </Grid>
+      <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" VerticalAlignment="Bottom"
+            Height="2" Background="{DynamicResource DragSplitLineColor}" 
+            IsVisible="{Binding showBottomLine, Mode=OneWay}">
+      </Grid>
       <Grid.ContextMenu>
         <ContextMenu>
           <MenuItem Classes="context" Header="{DynamicResource tracks.remove}" Command="{Binding Remove}"/>

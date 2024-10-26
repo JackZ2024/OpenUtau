@@ -72,6 +72,24 @@ namespace OpenUtau.App.Controls {
             SetPosition();
         }
 
+        public void showDragLine(bool up) {
+            if (ViewModel != null) {
+                if (up) {
+                    ViewModel.showTopLine = true;
+                    ViewModel.showBottomLine = false;
+                } else {
+                    ViewModel.showTopLine = false;
+                    ViewModel.showBottomLine = true;
+                }
+            }
+        }
+        public void hideDragLine() {
+            if (ViewModel != null) {
+                ViewModel.showTopLine = false;
+                ViewModel.showBottomLine = false;
+            }
+        }
+
         private void SetPosition() {
             Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, Offset.Y + (track?.TrackNo ?? 0) * trackHeight);

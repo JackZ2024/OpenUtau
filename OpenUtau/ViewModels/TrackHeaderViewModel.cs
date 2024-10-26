@@ -41,6 +41,8 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public bool Muted { get; set; }
         [Reactive] public bool Solo { get; set; }
         [Reactive] public Bitmap? Avatar { get; set; }
+        [Reactive] public bool showTopLine { get; set; }
+        [Reactive] public bool showBottomLine { get; set; }
 
         public ViewModelActivator Activator { get; }
 
@@ -53,6 +55,8 @@ namespace OpenUtau.App.ViewModels {
             SelectRendererCommand = ReactiveCommand.Create<string>(_ => { });
             Activator = new ViewModelActivator();
             track = new UTrack(DocManager.Inst.Project);
+            showTopLine = false;
+            showBottomLine = false;
         }
 
         public TrackHeaderViewModel(UTrack track) {
