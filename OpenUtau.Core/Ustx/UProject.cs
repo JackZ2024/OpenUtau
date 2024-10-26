@@ -167,6 +167,29 @@ namespace OpenUtau.Core.Ustx {
             }
             curKey.key = value;
         }
+        public UTempo GetCurTempo(int tick) {
+            UTempo? curTempo = null;
+            foreach (var tempo in tempos) {
+                if (tempo.position > tick) {
+                    break;
+                } else {
+                    curTempo = tempo;
+                }
+            }
+            return (curTempo == null ? tempos[0] : curTempo);
+        }
+        public UTimeSignature GetCurTimeSignatures(int tick) {
+            UTimeSignature? curTimeSignature = null;
+            this.timeAxis.TickPosToBarBeat(tick, out int timebar, out int _, out int _);
+            foreach (var timeSignature in timeSignatures) {
+                if (timeSignature.barPosition > timebar) {
+                    break;
+                } else {
+                    curTimeSignature = timeSignature;
+                }
+            }
+            return (curTimeSignature == null ? timeSignatures[0] : curTimeSignature);
+        }
 
         public void BeforeSave() {
             foreach (var track in tracks) {

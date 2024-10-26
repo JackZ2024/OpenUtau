@@ -1197,7 +1197,6 @@ namespace OpenUtau.App.Views {
             }
         }
         public void TrackHeaderCanvasPointerMoved(object sender, PointerEventArgs args) {
-            Console.WriteLine("TrackHeaderCanvasPointerMoved----");
             if (ValueTipCanvas != null) {
                 valueTipPointerPosition = args.GetCurrentPoint(ValueTipCanvas!).Position;
             }

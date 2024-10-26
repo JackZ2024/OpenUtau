@@ -39,12 +39,14 @@ namespace OpenUtau.App.ViewModels {
             MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(Project.EndTick));
         }
         public void PlayOrPause(int tick = -1, int endTick = -1, int trackNo = -1) {
-            MetronomePlayer.Instance.UpdateParmas((int)Project.tempos[0].bpm, Project.timeSignatures[0].beatPerBar, Project.timeSignatures[0].beatUnit);
+            int curTick = tick == -1 ? DocManager.Inst.playPosTick : tick;
+            var timeSignature = Project.GetCurTimeSignatures(curTick);
+            MetronomePlayer.Instance.UpdateParmas((int)Project.GetCurTempo(curTick).bpm, timeSignature.beatPerBar, timeSignature.beatUnit);
             PlaybackManager.Inst.PlayOrPause(tick: tick, endTick: endTick, trackNo: trackNo);
             var lockStartTime = Convert.ToBoolean(Preferences.Default.LockStartTime);
             if (!PlaybackManager.Inst.Playing && !PlaybackManager.Inst.StartingToPlay && lockStartTime) {
                 DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(PlaybackManager.Inst.StartTick, true));
-                MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(Math.Max(0, tick)));
+                MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(PlaybackManager.Inst.StartTick));
             }
         }
         public void Pause() {
