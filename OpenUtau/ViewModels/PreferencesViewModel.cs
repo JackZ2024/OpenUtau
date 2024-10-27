@@ -96,8 +96,6 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public bool RememberUst{ get; set; }
         [Reactive] public bool RememberVsqx{ get; set; }
         [Reactive] public int ImportTempo{ get; set; }
-        [Reactive] public bool EnableGetLyricModule { get; set; }
-        [Reactive] public bool EnableGetLyricModuleButton { get; set; }
 
         private List<AudioOutputDevice>? audioOutputDevices;
         private AudioOutputDevice? audioOutputDevice;
@@ -163,9 +161,6 @@ namespace OpenUtau.App.ViewModels {
             RememberVsqx = Preferences.Default.RememberVsqx;
             ImportTempo = Preferences.Default.ImportTempo;
             ClearCacheOnQuit = Preferences.Default.ClearCacheOnQuit;
-            EnableGetLyricModule = Preferences.Default.EnableGetLyricModule;
-            EnableGetLyricModuleButton = (Preferences.Default.EnableGetLyricModule && !File.Exists(Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model/ggml-large-v3-turbo.bin")));
-
 
             this.WhenAnyValue(vm => vm.AudioOutputDevice)
                 .WhereNotNull()
@@ -353,12 +348,6 @@ namespace OpenUtau.App.ViewModels {
                     Preferences.Default.SkipRenderingMutedTracks = skipRenderingMutedTracks;
                     Preferences.Save();
                 });
-            this.WhenAnyValue(vm => vm.EnableGetLyricModule)
-               .Subscribe(enableGetLyricModule => {
-                   Preferences.Default.EnableGetLyricModule = enableGetLyricModule;
-                   Preferences.Save();
-                   EnableGetLyricModuleButton = (Preferences.Default.EnableGetLyricModule && !File.Exists(Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model/ggml-large-v3-turbo.bin")));
-               });
         }
 
         public void TestAudioOutputDevice() {

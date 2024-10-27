@@ -5,13 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
-using NAudio.Wave.SampleProviders;
-using NAudio.Wave;
 using NWaves.Signals;
 using OpenUtau.Core.Ustx;
-using Whisper.net;
-using Whisper.net.LibraryLoader;
-using OpenUtau.Core.Util;
 
 namespace OpenUtau.Core.Analysis.Some {
     public static class AudioSlicer{
@@ -337,39 +332,6 @@ namespace OpenUtau.Core.Analysis.Some {
                         }
                         lastX = tickX;
                         lastY = y;
-                    }
-                }
-            }
-
-            if (Preferences.Default.EnableGetLyricModule) {
-                var modelPath = Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model/ggml-large-v3-turbo.bin");
-                if (File.Exists(modelPath)) {
-                    using var whisperFactory = WhisperFactory.FromPath(modelPath);
-                    var order = new List<RuntimeLibrary>() { RuntimeLibrary.Cuda, RuntimeLibrary.Cpu };
-                    RuntimeOptions.Instance.SetRuntimeLibraryOrder(order);
-
-                    string lyric = "";
-                    using var processor = whisperFactory.CreateBuilder()
-                        .WithLanguage("auto").SplitOnWord().WithMaxSegmentLength(1)
-                        .WithSegmentEventHandler((segment) => {
-                            Console.WriteLine($"{segment.Start}->{segment.End}: {segment.Text}");
-                            lyric += segment.Text;
-                        })
-                        .Build();
-
-                    // This section processes the audio file and prints the results (start time, end time and text) to the console.
-                    using var fileStream = File.OpenRead(wavePart.FilePath);
-                    using var wavStream = new MemoryStream();
-
-                    using var reader = new WaveFileReader(fileStream);
-                    var resampler = new WdlResamplingSampleProvider(reader.ToSampleProvider(), 16000);
-                    WaveFileWriter.WriteWavFileToStream(wavStream, resampler.ToWaveProvider16());
-                    wavStream.Seek(0, SeekOrigin.Begin);
-
-                    processor.Process(wavStream);
-                    if (part.notes.Count > 0) {
-                        var notes = part.notes.ToArray();
-                        notes[0].lyric = lyric;
                     }
                 }
             }

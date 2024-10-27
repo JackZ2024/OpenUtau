@@ -424,11 +424,6 @@
   </system:String>
   <system:String x:Key="prefs.rendering.threads.numthreads">最大渲染线程数</system:String>
   <system:String x:Key="prefs.rendering.wavtool">Wavtool</system:String>
-  <system:String x:Key="prefs.audio2midi">音频转MIDI</system:String>
-  <system:String x:Key="prefs.audio2midi.enablegetpitch">启用音高获取</system:String>
-  <system:String x:Key="prefs.audio2midi.downloadGetPitchMoudle">下载音高获取模块</system:String>
-  <system:String x:Key="prefs.audio2midi.enablegetlyric">启用歌词获取</system:String>
-  <system:String x:Key="prefs.audio2midi.downloadGetLyricMoudle">下载歌词获取模块</system:String>
 
   <system:String x:Key="progress.loadingsingers">正在加载歌手...</system:String>
   <system:String x:Key="progress.saved">工程已保存 {0}</system:String>

@@ -44,9 +44,12 @@ namespace OpenUtau.App.ViewModels {
             MetronomePlayer.Instance.UpdateParmas((int)Project.GetCurTempo(curTick).bpm, timeSignature.beatPerBar, timeSignature.beatUnit);
             PlaybackManager.Inst.PlayOrPause(tick: tick, endTick: endTick, trackNo: trackNo);
             var lockStartTime = Convert.ToBoolean(Preferences.Default.LockStartTime);
-            if (!PlaybackManager.Inst.Playing && !PlaybackManager.Inst.StartingToPlay && lockStartTime) {
-                DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(PlaybackManager.Inst.StartTick, true));
-                MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(PlaybackManager.Inst.StartTick));
+            if (!PlaybackManager.Inst.Playing && !PlaybackManager.Inst.StartingToPlay) {
+                if (lockStartTime) {
+                    DocManager.Inst.ExecuteCmd(new SeekPlayPosTickNotification(PlaybackManager.Inst.StartTick, true));
+                } else {
+                    MessageBus.Current.SendMessage(new SeekPlayPosChangedEvent(curTick));
+                }
             }
         }
         public void Pause() {

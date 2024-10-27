@@ -447,11 +447,6 @@ Warning: this option removes custom presets.</system:String>
   </system:String>
   <system:String x:Key="prefs.rendering.threads.numthreads">Maximum Render Threads</system:String>
   <system:String x:Key="prefs.rendering.wavtool">Wavtool</system:String>
-  <system:String x:Key="prefs.audio2midi">Audio To MIDI</system:String>
-  <system:String x:Key="prefs.audio2midi.enablegetpitch">Enable Get Pitch</system:String>
-  <system:String x:Key="prefs.audio2midi.downloadGetPitchMoudle">Download Pitch Moudle</system:String>
-  <system:String x:Key="prefs.audio2midi.enablegetlyric">Enable Get Lyric</system:String>
-  <system:String x:Key="prefs.audio2midi.downloadGetLyricMoudle">Download Lyric Moudle</system:String>
 
   <system:String x:Key="progress.loadingsingers">Loading Singers...</system:String>
   <system:String x:Key="progress.saved">Project saved. {0}</system:String>

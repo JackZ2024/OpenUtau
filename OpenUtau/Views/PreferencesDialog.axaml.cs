@@ -1,14 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using OpenUtau.App.ViewModels;
 using OpenUtau.Core;
-using Whisper.net.Ggml;
-using OpenUtau.Core.Util;
 
 namespace OpenUtau.App.Views {
     public partial class PreferencesDialog : Window {
@@ -36,22 +32,6 @@ namespace OpenUtau.App.Views {
                 SingerManager.Inst.SearchAllSingers();
             });
             DocManager.Inst.ExecuteCmd(new SingersRefreshedNotification());
-            MessageBox.CloseLoading();
-        }
-
-        async void DownloadGetLyricModule(object sender, RoutedEventArgs e) {
-            MessageBox.ShowLoading(this);
-            var modelPath = Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model/ggml-large-v3-turbo.bin");
-            if (!File.Exists(modelPath)) {
-                if (!Directory.Exists(Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model"))) {
-                    Directory.CreateDirectory(Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model"));
-                }
-                using var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(GgmlType.LargeV3Turbo);
-                using var fileWriter = File.OpenWrite(modelPath);
-                await modelStream.CopyToAsync(fileWriter);
-            }
-            ((PreferencesViewModel)DataContext!).EnableGetLyricModuleButton = 
-                (Preferences.Default.EnableGetLyricModule && !File.Exists(Path.Combine(PathManager.Inst.DependencyPath, "Whisper/model/ggml-large-v3-turbo.bin")));
             MessageBox.CloseLoading();
         }
 
