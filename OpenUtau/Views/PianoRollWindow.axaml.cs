@@ -125,7 +125,7 @@ namespace OpenUtau.App.Views {
                     var customEx = new MessageCustomizableException("Failed to run editing macro", "<translate:errors.failed.runeditingmacro>", e);
                     DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(customEx));
                 }
-                
+
             });
             ViewModel.NoteBatchEdits.AddRange(new List<BatchEdit>() {
                 new LoadRenderedPitch(),
@@ -301,7 +301,7 @@ namespace OpenUtau.App.Views {
             Preferences.Save();
             ViewModel.RaisePropertyChanged(nameof(ViewModel.ShowGhostNotes));
             MessageBus.Current.SendMessage(new PianorollRefreshEvent("Part"));
-            
+
         }
         void OnMenuUseTrackColor(object sender, RoutedEventArgs args) {
             Preferences.Default.UseTrackColor = !Preferences.Default.UseTrackColor;
@@ -655,7 +655,7 @@ namespace OpenUtau.App.Views {
         }
 
         private void NotesCanvasLeftPointerPressed(Control control, PointerPoint point, PointerPressedEventArgs args) {
-            if (ViewModel.NotesViewModel.DrawPitchTool || ViewModel.NotesViewModel.OverwritePitchTool) {
+            if (ViewModel.NotesViewModel.DrawPitchTool || ViewModel.NotesViewModel.DrawLinePitchTool || ViewModel.NotesViewModel.OverwritePitchTool) {
                 ViewModel.NotesViewModel.DeselectNotes();
                 if (args.KeyModifiers == KeyModifiers.Alt) {
                     editState = new SmoothenPitchState(control, ViewModel, this);
@@ -663,6 +663,8 @@ namespace OpenUtau.App.Views {
                 } else if (args.KeyModifiers != cmdKey) {
                     if (ViewModel.NotesViewModel.DrawPitchTool) {
                         editState = new DrawPitchState(control, ViewModel, this);
+                    } else if (ViewModel.NotesViewModel.DrawLinePitchTool) {
+                        editState = new DrawLinePitchState(control, ViewModel, this);
                     } else {
                         editState = new OverwritePitchState(control, ViewModel, this);
                     }
@@ -742,6 +744,7 @@ namespace OpenUtau.App.Views {
                 ViewModel.NotesViewModel.PenTool && args.KeyModifiers == cmdKey ||
                 ViewModel.NotesViewModel.PenPlusTool && args.KeyModifiers == cmdKey ||
                 ViewModel.NotesViewModel.DrawPitchTool && args.KeyModifiers == cmdKey ||
+                ViewModel.NotesViewModel.DrawLinePitchTool && args.KeyModifiers == cmdKey ||
                 ViewModel.NotesViewModel.OverwritePitchTool && args.KeyModifiers == cmdKey) {
                 if (args.KeyModifiers == KeyModifiers.None) {
                     // New selection.
@@ -766,7 +769,7 @@ namespace OpenUtau.App.Views {
 
         private void NotesCanvasRightPointerPressed(Control control, PointerPoint point, PointerPressedEventArgs args) {
             var selectedNotes = ViewModel.NotesViewModel.Selection.ToList();
-            if (ViewModel.NotesViewModel.DrawPitchTool || ViewModel.NotesViewModel.OverwritePitchTool) {
+            if (ViewModel.NotesViewModel.DrawPitchTool || ViewModel.NotesViewModel.DrawLinePitchTool || ViewModel.NotesViewModel.OverwritePitchTool) {
                 editState = new ResetPitchState(control, ViewModel, this);
                 return;
             }
@@ -898,7 +901,7 @@ namespace OpenUtau.App.Views {
             if (ViewModel?.NotesViewModel?.HitTest == null) {
                 return;
             }
-            if(((ViewModel.NotesViewModel.DrawPitchTool || ViewModel.NotesViewModel.OverwritePitchTool) && args.KeyModifiers != cmdKey) || ViewModel.NotesViewModel.EraserTool) {
+            if(((ViewModel.NotesViewModel.DrawPitchTool || ViewModel.NotesViewModel.DrawLinePitchTool || ViewModel.NotesViewModel.OverwritePitchTool) && args.KeyModifiers != cmdKey) || ViewModel.NotesViewModel.EraserTool) {
                 Cursor = null;
                 return;
             }
@@ -1481,6 +1484,10 @@ namespace OpenUtau.App.Views {
                     }
                     if (isCtrl) {
                         notesVm.SelectToolCommand?.Execute("4+").Subscribe();
+                        return true;
+                    }
+                    if (isShift) {
+                        notesVm.SelectToolCommand?.Execute("4++").Subscribe();
                         return true;
                     }
                     break;
