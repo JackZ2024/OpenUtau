@@ -222,12 +222,19 @@
                        PointerReleased="PartsCanvasPointerReleased"
                        DoubleTapped="PartsCanvasDoubleTapped"
                        PointerWheelChanged="PartsCanvasPointerWheelChanged">
-          <Rectangle Name="PlayPosHighlight"
+          <Rectangle Name="PlayPosHighlight" IsVisible="{Binding ShowWidthTimeline}"
                      Width="{Binding PlayPosHighlightWidth, Mode=OneWay}"
                      Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
                      Canvas.Left="{Binding PlayPosHighlightX, Mode=OneWay}"
                      Canvas.Top="0"
                      Fill="{DynamicResource NeutralAccentBrushSemi2}"
+                     IsHitTestVisible="False"/>
+          <Rectangle Name="PlayPosHighlight2" IsVisible="{Binding ShowNarrowTimeline}"
+                     Width="1"
+                     Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
+                     Canvas.Left="{Binding PlayPosHighlightX, Mode=OneWay}"
+                     Canvas.Top="0" ZIndex="100"
+                     Fill="{Binding NarrowTimelineColor}" 
                      IsHitTestVisible="False"/>
           <Rectangle Name="SelectionBox" StrokeThickness="2"
                      Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"

@@ -175,12 +175,18 @@
         </c:NotesCanvas.ContextMenu>
       </c:NotesCanvas>
       <Canvas Grid.Row="3" Grid.Column="1" IsHitTestVisible="False" ClipToBounds="True">
-        <Rectangle Name="PlayPosHighlight"
+        <Rectangle Name="PlayPosHighlight" IsVisible="{Binding NotesViewModel.ShowWidthTimeline}"
                    Width="{Binding NotesViewModel.PlayPosHighlightWidth, Mode=OneWay}"
                    Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
                    Canvas.Left="{Binding NotesViewModel.PlayPosHighlightX, Mode=OneWay}"
                    Canvas.Top="0" ZIndex="-10"
                    Fill="{DynamicResource NeutralAccentBrushSemi2}"/>
+        <Rectangle Name="PlayPosHighlight2" IsVisible="{Binding NotesViewModel.ShowNarrowTimeline}"
+                   Width="1"
+                   Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
+                   Canvas.Left="{Binding NotesViewModel.PlayPosHighlightX, Mode=OneWay}"
+                   Canvas.Top="0" ZIndex="100"
+                   Fill="{Binding NotesViewModel.NarrowTimelineColor}"/>
         <Rectangle Name="SelectionBox" StrokeThickness="2"
                    Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
                    Fill="{DynamicResource TickLineBrushLow}" ZIndex="1000"

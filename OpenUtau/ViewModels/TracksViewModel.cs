@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Avalonia;
+using Avalonia.Media;
 using DynamicData;
 using DynamicData.Binding;
 using OpenUtau.Core;
@@ -47,6 +48,7 @@ namespace OpenUtau.App.ViewModels {
         public readonly UPart part;
         public PartRedrawEvent(UPart part) { this.part = part; }
     }
+    public class TimelineRefreshEvent { }
 
     public class TracksViewModel : ViewModelBase, ICmdSubscriber {
         public UProject Project => DocManager.Inst.Project;
@@ -94,6 +96,9 @@ namespace OpenUtau.App.ViewModels {
 
         public readonly List<UPart> SelectedParts = new List<UPart>();
         private readonly HashSet<UPart> TempSelectedParts = new HashSet<UPart>();
+        [Reactive] public bool ShowNarrowTimeline { get; set; }
+        [Reactive] public bool ShowWidthTimeline { get; set; }
+        [Reactive] public IBrush NarrowTimelineColor { get; set; }
 
         public TracksViewModel() {
             viewportTicks = this.WhenAnyValue(x => x.Bounds, x => x.TickWidth)
@@ -127,6 +132,15 @@ namespace OpenUtau.App.ViewModels {
             TickWidth = ViewConstants.TickWidthDefault;
             TrackHeight = ViewConstants.TrackHeightDefault;
             Notify();
+            ShowNarrowTimeline = Preferences.Default.UseNarrowTimeline;
+            ShowWidthTimeline = !Preferences.Default.UseNarrowTimeline;
+            NarrowTimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
+            MessageBus.Current.Listen<TimelineRefreshEvent>()
+                .Subscribe(_ => { 
+                    ShowNarrowTimeline = Preferences.Default.UseNarrowTimeline;
+                    ShowWidthTimeline = !Preferences.Default.UseNarrowTimeline;
+                    NarrowTimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
+                });
 
             DocManager.Inst.AddSubscriber(this);
         }

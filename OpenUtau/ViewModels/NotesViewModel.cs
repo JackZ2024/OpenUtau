@@ -11,8 +11,6 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using DynamicData;
 using DynamicData.Binding;
-using NAudio.Wave.SampleProviders;
-using Newtonsoft.Json;
 using OpenUtau.App.Views;
 using OpenUtau.Core;
 using OpenUtau.Core.Metronome;
@@ -21,7 +19,6 @@ using OpenUtau.Core.Util;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-using YamlDotNet.Serialization;
 
 namespace OpenUtau.App.ViewModels {
     public class NotesRefreshEvent { }
@@ -142,6 +139,9 @@ namespace OpenUtau.App.ViewModels {
                 }
             }
         }
+        [Reactive] public bool ShowNarrowTimeline { get; set; }
+        [Reactive] public bool ShowWidthTimeline { get; set; }
+        [Reactive] public IBrush NarrowTimelineColor { get; set; }
 
         public NotesViewModel() {
             SnapDivs = new List<MenuItemViewModel>();
@@ -347,6 +347,16 @@ namespace OpenUtau.App.ViewModels {
                             LoadTrackColor(Part, Project);
                             break;
                     }
+                });
+
+            ShowNarrowTimeline = Preferences.Default.UseNarrowTimeline;
+            ShowWidthTimeline = !Preferences.Default.UseNarrowTimeline;
+            NarrowTimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
+            MessageBus.Current.Listen<TimelineRefreshEvent>()
+                .Subscribe(_ => {
+                    ShowNarrowTimeline = Preferences.Default.UseNarrowTimeline;
+                    ShowWidthTimeline = !Preferences.Default.UseNarrowTimeline;
+                    NarrowTimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
                 });
         }
 

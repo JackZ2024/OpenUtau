@@ -206,6 +206,21 @@
               <TextBlock Text="{DynamicResource prefs.appearance.showghostnotes}" HorizontalAlignment="Left"/>
               <ToggleSwitch IsChecked="{Binding ShowGhostNotes}"/>
             </Grid>
+            <Grid>
+                <TextBlock Text="{DynamicResource prefs.appearance.usenarrowtimeline}" HorizontalAlignment="Left"/>
+                <ComboBox ItemsSource="{Binding TimelineColors}" SelectedItem="{Binding TimelineColor}"
+                          Width="130" Height="24" VerticalAlignment="Center" IsVisible="{Binding UseNarrowTimeline}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Background="{Binding}" VerticalAlignment="Center" Width="18" Height="18" Margin="0,1,0,0"/>
+                                <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ToggleSwitch IsChecked="{Binding UseNarrowTimeline}" HorizontalAlignment="Right"/>
+            </Grid>
           </StackPanel>
         </HeaderedContentControl>
         <HeaderedContentControl Classes="groupbox" Header="{DynamicResource prefs.otoeditor}">

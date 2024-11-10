@@ -12,6 +12,7 @@ using OpenUtau.Core.Util;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using OpenUtau.Core.Render;
+using Avalonia.Media;
 
 namespace OpenUtau.App.ViewModels {
     public class PreferencesViewModel : ViewModelBase {
@@ -76,6 +77,14 @@ namespace OpenUtau.App.ViewModels {
         }
 
         [Reactive] public bool Beta { get; set; }
+
+        [Reactive] public bool UseNarrowTimeline { get; set; }
+        [Reactive] public IBrush TimelineColor { get; set; }
+        private List<IBrush> _colors;
+        public List<IBrush> TimelineColors {
+            get => _colors;
+            set => this.RaiseAndSetIfChanged(ref _colors, value);
+        }
 
         public class LyricsHelperOption {
             public readonly Type klass;
@@ -161,6 +170,25 @@ namespace OpenUtau.App.ViewModels {
             RememberVsqx = Preferences.Default.RememberVsqx;
             ImportTempo = Preferences.Default.ImportTempo;
             ClearCacheOnQuit = Preferences.Default.ClearCacheOnQuit;
+            UseNarrowTimeline = Preferences.Default.UseNarrowTimeline;
+            TimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
+
+            _colors = new List<IBrush>
+            {
+                Brushes.White,
+                Brushes.Black,
+                Brushes.Gray,
+                Brushes.Red,
+                Brushes.Green,
+                Brushes.Blue,
+                Brushes.Yellow,
+                Brushes.Purple,
+                Brushes.Orange,
+                Brushes.Pink,
+                Brushes.Magenta,
+                Brushes.LightGreen,
+                Brushes.DarkGreen
+            };
 
             this.WhenAnyValue(vm => vm.AudioOutputDevice)
                 .WhereNotNull()
@@ -348,6 +376,20 @@ namespace OpenUtau.App.ViewModels {
                     Preferences.Default.SkipRenderingMutedTracks = skipRenderingMutedTracks;
                     Preferences.Save();
                 });
+            this.WhenAnyValue(vm => vm.UseNarrowTimeline)
+               .Subscribe(useNarrowTimeline => {
+                   Preferences.Default.UseNarrowTimeline = useNarrowTimeline;
+                   Preferences.Save();
+                   MessageBus.Current.SendMessage(new TimelineRefreshEvent());
+               });
+            this.WhenAnyValue(vm => vm.TimelineColor)
+               .Subscribe(timelineColor => {
+                   string? color = timelineColor.ToString();
+                   if (color == null) return;
+                   Preferences.Default.NarrowTimelineColor = color.ToString();
+                   Preferences.Save();
+                   MessageBus.Current.SendMessage(new TimelineRefreshEvent());
+               });
         }
 
         public void TestAudioOutputDevice() {
