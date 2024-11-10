@@ -184,7 +184,7 @@
         <Rectangle Name="PlayPosHighlight2" IsVisible="{Binding NotesViewModel.ShowNarrowTimeline}"
                    Width="1"
                    Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
-                   Canvas.Left="{Binding NotesViewModel.PlayPosHighlightX, Mode=OneWay}"
+                   Canvas.Left="{Binding NotesViewModel.PlayPosX, Mode=OneWay}"
                    Canvas.Top="0" ZIndex="100"
                    Fill="{Binding NotesViewModel.NarrowTimelineColor}"/>
         <Rectangle Name="SelectionBox" StrokeThickness="2"

@@ -65,6 +65,7 @@ namespace OpenUtau.App.Views {
 
             Dictionary<string, string> gestureDict = new Dictionary<string, string> {
                 { "pianoroll.menu.notes.loadrenderedpitch", "Ctrl+R" },
+                { "pianoroll.menu.notes.loadrenderedpitchforSelectedNote", "Shift+R" },
                 { "pianoroll.menu.notes.autolegato", "Ctrl+L" },
 
                 { "pianoroll.menu.notes.reset.pitchbends", "Alt+B" },

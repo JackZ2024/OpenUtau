@@ -232,7 +232,7 @@
           <Rectangle Name="PlayPosHighlight2" IsVisible="{Binding ShowNarrowTimeline}"
                      Width="1"
                      Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
-                     Canvas.Left="{Binding PlayPosHighlightX, Mode=OneWay}"
+                     Canvas.Left="{Binding PlayPosX, Mode=OneWay}"
                      Canvas.Top="0" ZIndex="100"
                      Fill="{Binding NarrowTimelineColor}" 
                      IsHitTestVisible="False"/>
