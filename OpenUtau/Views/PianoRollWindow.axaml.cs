@@ -165,14 +165,13 @@ namespace OpenUtau.App.Views {
                 InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null,
             }));
             ViewModel.ResetBatchEdits.AddRange(new List<BatchEdit>() {
-                new ResetAllParameters(),
+                new ResetAll(),
                 new ResetPitchBends(),
                 new ResetAllExpressions(),
                 new ClearVibratos(),
                 new ResetVibratos(),
                 new ClearTimings(),
                 new ResetAliases(),
-                new ResetAll(),
             }.Select(edit => new MenuItemViewModel() {
                 Header = ThemeManager.GetString(edit.Name),
                 Command = noteBatchEditCommand,
