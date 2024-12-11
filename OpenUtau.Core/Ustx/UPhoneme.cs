@@ -12,28 +12,28 @@ namespace OpenUtau.Core.Ustx {
 
         public int position { get; set; }
         public string phoneme { get; set; }
-        public string phonemeMapped { get; private set; }
-        public UEnvelope envelope { get; private set; } = new UEnvelope();
-        public UOto oto { get; private set; }
-        public double preutter { get; private set; }
-        public double overlap { get; private set; }
-        public double autoPreutter { get; private set; }
-        public double autoOverlap { get; private set; }
-        public bool overlapped { get; private set; }
-        public double tailIntrude { get; private set; }
-        public double tailOverlap { get; private set; }
-        public double? preutterDelta { get; set; }
-        public double? overlapDelta { get; set; }
+        [YamlIgnore] public string phonemeMapped { get; private set; }
+        [YamlIgnore] public UEnvelope envelope { get; private set; } = new UEnvelope();
+        [YamlIgnore] public UOto oto { get; private set; }
+        [YamlIgnore] public double preutter { get; private set; }
+        [YamlIgnore] public double overlap { get; private set; }
+        [YamlIgnore] public double autoPreutter { get; private set; }
+        [YamlIgnore] public double autoOverlap { get; private set; }
+        [YamlIgnore] public bool overlapped { get; private set; }
+        [YamlIgnore] public double tailIntrude { get; private set; }
+        [YamlIgnore] public double tailOverlap { get; private set; }
+        [YamlIgnore] public double? preutterDelta { get; set; }
+        [YamlIgnore] public double? overlapDelta { get; set; }
 
-        public UNote Parent { get; set; }
-        public int Duration { get; private set; }
-        public int End { get { return position + Duration; } }
-        public double PositionMs { get; private set; }
-        public double DurationMs => EndMs - PositionMs;
-        public double EndMs { get; private set; }
-        public UPhoneme Prev { get; set; }
-        public UPhoneme Next { get; set; }
-        public bool Error { get; set; } = false;
+        [YamlIgnore] public UNote Parent { get; set; }
+        [YamlIgnore] public int Duration { get; private set; }
+        [YamlIgnore] public int End { get { return position + Duration; } }
+        [YamlIgnore] public double PositionMs { get; private set; }
+        [YamlIgnore] public double DurationMs => EndMs - PositionMs;
+        [YamlIgnore] public double EndMs { get; private set; }
+        [YamlIgnore] public UPhoneme Prev { get; set; }
+        [YamlIgnore] public UPhoneme Next { get; set; }
+        [YamlIgnore] public bool Error { get; set; } = false;
 
         public override string ToString() => $"\"{phoneme}\" pos:{position}";
 

@@ -144,6 +144,10 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public bool ShowWidthTimeline { get; set; }
         [Reactive] public IBrush NarrowTimelineColor { get; set; }
 
+        [Reactive] public int offsetValue { get; set; } = 15;
+        [Reactive] public bool onlySelectedNotes { get; set; } = false;
+        [Reactive] public string tipInfo { get; set; } = "";
+
         public NotesViewModel() {
             SnapDivs = new List<MenuItemViewModel>();
             SetSnapUnitCommand = ReactiveCommand.Create<int>(div => {
@@ -1114,6 +1118,25 @@ namespace OpenUtau.App.ViewModels {
             DocManager.Inst.StartUndoGroup();
             DocManager.Inst.ExecuteCmd(new MoveCurvePointsCommand(Project, Part, PrimaryKey, xs.ToArray(), ys.ToArray()));
             DocManager.Inst.EndUndoGroup();
+        }
+        public void BatchMoveCurvePoints() {
+            tipInfo = "";
+            if (Project == null) { return; }
+            if (Part == null) { return; }
+            List<UNote> notes = new List<UNote>();
+            if(onlySelectedNotes) {
+                notes = Selection.ToList();
+                if (notes.Count == 0) {
+                    tipInfo = ThemeManager.GetString("editcurve.tipinfo");
+                    return;
+                }
+            }
+
+            DocManager.Inst.StartUndoGroup();
+            DocManager.Inst.ExecuteCmd(new BatchMoveCurvePointsCommand(Project, Part, PrimaryKey, offsetValue, notes.ToArray()));
+            DocManager.Inst.EndUndoGroup();
+
+            MessageBus.Current.SendMessage(new CurvesRefreshEvent());
         }
         public void DeleteCurvePoints() {
 

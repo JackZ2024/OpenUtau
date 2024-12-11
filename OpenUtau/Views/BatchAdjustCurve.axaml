@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" MinWidth="270" MinHeight="80" Width="350" Height="100"
+        x:Class="OpenUtau.App.Views.BatchAdjustCurve" WindowStartupLocation="CenterOwner"
+        xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+        Icon="/Assets/open-utau.ico"
+        Title="{Binding Title}"
+        Opened="OnOpened">
+    <Window.Styles>
+        <StyleInclude Source="/Styles/PianoRollStyles.axaml"/>
+    </Window.Styles>
+    <Grid Margin="10,10,10,4" RowDefinitions="30,30,Auto">
+        <Grid Grid.Row="0" Margin="0,0,0,0" ColumnDefinitions="80, *, Auto" >
+            <Label Grid.Column="0" Content="{StaticResource editcurve.adjustvalue}" VerticalAlignment="Center"/>
+            <Slider Grid.Column="1" Classes="fader" Value="{Binding offsetValue}" Minimum="-100" Maximum="100"
+                    TickPlacement="BottomRight" TickFrequency="0.1" IsSnapToTickEnabled="true" 
+                    VerticalAlignment="Center"/>
+            <TextBox Grid.Column="2" Margin="10,0,0,0" Text="{Binding offsetValue, Mode=OneWay}" Width="20" 
+                     VerticalAlignment="Center"
+                     TextChanged="onTextChanged"/>
+        </Grid>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left">
+            <TextBlock Text="{StaticResource editcurve.onlyselectednotes}" VerticalAlignment="Center"/>
+            <ToggleSwitch IsChecked="{Binding onlySelectedNotes}"/>
+
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+            <Button Content="{StaticResource editcurve.close}" Margin="0" Click="OnCancel"/>
+            <Button Content="{StaticResource editcurve.apply}" Margin="0" Click="OnFinish"/>
+        </StackPanel>
+        <TextBlock Grid.Row="2" Text="{Binding tipInfo}" Foreground="Red" VerticalAlignment="Center"/>
+    </Grid>
+</Window>

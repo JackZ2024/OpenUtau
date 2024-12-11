@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
-using UtfUnknown.Core.Models.SingleByte.Vietnamese;
 
 namespace OpenUtau.Core {
     public abstract class ExpCommand : UCommand {
@@ -345,6 +344,69 @@ namespace OpenUtau.Core {
             if (oldXs != null && oldYs != null) {
                 curve.xs.AddRange(oldXs);
                 curve.ys.AddRange(oldYs);
+            }
+        }
+    }
+    public class BatchMoveCurvePointsCommand : ExpCommand {
+        readonly UProject project;
+        readonly string abbr;
+        int offset;
+        UNote[] Notes;
+        public override ValidateOptions ValidateOptions
+            => new ValidateOptions {
+                SkipTiming = true,
+                Part = Part,
+                SkipPhonemizer = true,
+                SkipPhoneme = true,
+            };
+        public BatchMoveCurvePointsCommand(UProject project, UVoicePart part, string abbr, int offset, UNote[] Notes) : base(part) {
+            this.project = project;
+            this.abbr = abbr;
+            this.offset = offset;
+            this.Notes = Notes;
+        }
+        public override string ToString() => "Batch Move Curve Points";
+        public override void Execute() {
+            UExpressionDescriptor? descriptor;
+            if (Part == null || !project.tracks[Part!.trackNo].TryGetExpDescriptor(project, this.abbr, out descriptor)) {
+                return;
+            }
+            if (descriptor.type != UExpressionType.Curve) {
+                return;
+            }
+            var curve = Part.curves.FirstOrDefault(c => c.abbr == this.abbr);
+            if (curve == null) {
+                return;
+            }
+
+            for (int i = 0; i < curve.xs.Count; i++) {
+                if (Notes.Length == 0) {
+                    curve.ys[i] = Math.Clamp(curve.ys[i] + this.offset, (int)descriptor.min, (int)descriptor.max);
+                } else {
+                    foreach (var note in Notes) {
+                        if (curve.xs[i] > note.position && curve.xs[i] < note.End) {
+                            curve.ys[i] = Math.Clamp(curve.ys[i] + this.offset, (int)descriptor.min, (int)descriptor.max);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        public override void Unexecute() {
+            UExpressionDescriptor? descriptor;
+            if (Part == null || !project.tracks[Part!.trackNo].TryGetExpDescriptor(project, this.abbr, out descriptor)) {
+                return;
+            }
+            if (descriptor.type != UExpressionType.Curve) {
+                return;
+            }
+            var curve = Part.curves.FirstOrDefault(c => c.abbr == this.abbr);
+            if (curve == null) {
+                return;
+            }
+
+            for (int i = 0; i < curve.xs.Count; i++) {
+                curve.ys[i] = Math.Clamp(curve.ys[i] - this.offset, (int)descriptor.min, (int)descriptor.max);
             }
         }
     }

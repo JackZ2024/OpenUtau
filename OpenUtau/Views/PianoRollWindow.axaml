@@ -364,6 +364,7 @@
             </MenuItem>
             <MenuItem Header="{DynamicResource pianoroll.menu.lyrics.edit}" Click="OnMenuEditLyrics"/>
             <MenuItem Header="{DynamicResource pianoroll.menu.notedefaults}" Click="OnMenuNoteDefaults"/>
+            <MenuItem Header="{DynamicResource editcurve.curveadjust}" Click="OnMenuCurveEdit"/>
           </Menu>
         </Border>
         <Border Grid.Column="2">
@@ -614,10 +615,15 @@
                           IsChecked="{Binding NotesViewModel.LockStartTime}"
                           Command="{Binding NotesViewModel.LockStartTimeCommand}"
                           ToolTip.Tip="{DynamicResource pianoroll.toggle.lockStartTime}">
-                  <Grid Width="18" Height="18">
-                      <Path Classes="stroked" Data="M 4 4 L 4 15.5 M 4 10 L 12.5 4 L 12.5 15 Z"/>
-                  </Grid>
+              <Grid Width="18" Height="18">
+                <Path Classes="stroked" Data="M 4 4 L 4 15.5 M 4 10 L 12.5 4 L 12.5 15 Z"/>
+              </Grid>
             </ToggleButton>
+            <Border Classes="playback" Width="72" HorizontalAlignment="Right" Margin="4,0">
+              <Grid>
+                <TextBlock Text="{Binding Path=PlaybackViewModel.PlayPosTime, StringFormat={}{0:mm\\:ss\\.fff}}"/>
+              </Grid>
+            </Border>
           </StackPanel>
         </Border>
         <Border Grid.Column="4">

@@ -245,6 +245,20 @@ namespace OpenUtau.Core.Editing {
             docManager.EndUndoGroup();
         }
     }
+    public class ResetPhonemes : BatchEdit {
+        public virtual string Name => name;
+
+        private string name;
+
+        public ResetPhonemes() {
+            name = "pianoroll.menu.notes.reset.phonemes";
+        }
+
+        public void Run(UProject project, UVoicePart part, List<UNote> selectedNotes, DocManager docManager) {
+            part.updatePhonemes = true;
+            project.ValidateFull();
+        }
+    }
 
     public class ResetAll : BatchEdit {
         public virtual string Name => name;

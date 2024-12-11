@@ -135,6 +135,13 @@
   <system:String x:Key="lyrics.selectnotes">Select some notes first!</system:String>
   <system:String x:Key="lyrics.separators">Separators</system:String>
 
+  <system:String x:Key="editcurve.apply">Apply</system:String>
+  <system:String x:Key="editcurve.close">Close</system:String>
+  <system:String x:Key="editcurve.adjustvalue">Adjust value</system:String>
+  <system:String x:Key="editcurve.onlyselectednotes">Only selected notes range</system:String>
+  <system:String x:Key="editcurve.tipinfo">Selected notes is empty</system:String>
+  <system:String x:Key="editcurve.curveadjust">Curve Adjust</system:String>
+
   <system:String x:Key="remark.add">Add Remark</system:String>
   <system:String x:Key="remark.edit">Edit Remark</system:String>
   <system:String x:Key="remark.delete">Delete Remark</system:String>
@@ -316,6 +323,7 @@ Warning: this option removes custom presets.</system:String>
   <system:String x:Key="pianoroll.menu.notes.reset.phonemetimings">Reset phoneme timings</system:String>
   <system:String x:Key="pianoroll.menu.notes.reset.pitchbends">Reset pitch bends</system:String>
   <system:String x:Key="pianoroll.menu.notes.reset.vibratos">Reset vibratos</system:String>
+  <system:String x:Key="pianoroll.menu.notes.reset.phonemes">Reset phonemes</system:String>
   <system:String x:Key="pianoroll.menu.notes.mergenotes">Merge Notes</system:String>
   <system:String x:Key="pianoroll.menu.part">Part</system:String>
   <system:String x:Key="pianoroll.menu.part.legacypluginexp">Legacy Plugin (Experimental)</system:String>

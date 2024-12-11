@@ -172,6 +172,7 @@ namespace OpenUtau.App.Views {
                 new ResetVibratos(),
                 new ClearTimings(),
                 new ResetAliases(),
+                new ResetPhonemes(),
             }.Select(edit => new MenuItemViewModel() {
                 Header = ThemeManager.GetString(edit.Name),
                 Command = noteBatchEditCommand,
@@ -403,6 +404,13 @@ namespace OpenUtau.App.Views {
             if (dialog.Position.Y < 0) {
                 dialog.Position = dialog.Position.WithY(0);
             }
+        }
+
+        void OnMenuCurveEdit(object sender, RoutedEventArgs args) {
+            var dialog = new BatchAdjustCurve() {
+                DataContext = ViewModel.NotesViewModel
+            };
+            dialog.ShowDialog(this);
         }
 
         void AddBreathNote() {
@@ -937,7 +945,8 @@ namespace OpenUtau.App.Views {
             }
             var control = (Control)sender;
             var point = args.GetCurrentPoint(control);
-            editState.Update(point.Pointer, point.Position);
+            if(editState is not SmoothenPitchState)
+                editState.Update(point.Pointer, point.Position);
             editState.End(point.Pointer, point.Position);
             editState = null;
             Cursor = null;

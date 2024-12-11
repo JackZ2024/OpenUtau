@@ -128,6 +128,13 @@
   <system:String x:Key="lyrics.selectnotes">请先选择一些音符!</system:String>
   <system:String x:Key="lyrics.separators">分隔符</system:String>
 
+  <system:String x:Key="editcurve.apply">应用</system:String>
+  <system:String x:Key="editcurve.close">关闭</system:String>
+  <system:String x:Key="editcurve.adjustvalue">调整值</system:String>
+  <system:String x:Key="editcurve.onlyselectednotes">仅选择音符范围</system:String>
+  <system:String x:Key="editcurve.tipinfo">未选择音符</system:String>
+  <system:String x:Key="editcurve.curveadjust">曲线调整</system:String>
+
   <system:String x:Key="remark.add">添加备注</system:String>
   <system:String x:Key="remark.edit">编辑备注</system:String>
   <system:String x:Key="remark.delete">删除备注</system:String>
@@ -307,6 +314,7 @@
   <system:String x:Key="pianoroll.menu.notes.reset.phonemetimings">重置音素时机</system:String>
   <system:String x:Key="pianoroll.menu.notes.reset.pitchbends">重置滑音</system:String>
   <system:String x:Key="pianoroll.menu.notes.reset.vibratos">重置颤音</system:String>
+  <system:String x:Key="pianoroll.menu.notes.reset.phonemes">重置音素</system:String>
   <system:String x:Key="pianoroll.menu.notes.mergenotes">合并音符</system:String>
   <system:String x:Key="pianoroll.menu.part">片段</system:String>
   <system:String x:Key="pianoroll.menu.part.legacypluginexp">传统插件 (实验性)</system:String>

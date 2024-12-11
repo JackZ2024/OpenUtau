@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using OpenUtau.App.ViewModels;
 
 namespace OpenUtau.App.Views {

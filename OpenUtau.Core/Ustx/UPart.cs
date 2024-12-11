@@ -46,7 +46,7 @@ namespace OpenUtau.Core.Ustx {
         [YamlMember(Order = 101)]
         public List<UCurve> curves = new List<UCurve>();
 
-        [YamlIgnore] public List<UPhoneme> phonemes = new List<UPhoneme>();
+        public List<UPhoneme> phonemes = new List<UPhoneme>();
         [YamlIgnore] public int phonemesRevision = 0;
         [YamlIgnore] public List<RenderPhrase> renderPhrases = new List<RenderPhrase>();
 
@@ -58,6 +58,7 @@ namespace OpenUtau.Core.Ustx {
 
         [YamlIgnore] public bool PhonemesUpToDate => notesTimestamp == phonemesTimestamp;
         [YamlIgnore] public ISignalSource Mix => mix;
+        [YamlIgnore] public bool updatePhonemes = false;
 
         public override string DisplayName => name;
         public override int Duration { get => duration; set => duration = value; }
@@ -152,9 +153,9 @@ namespace OpenUtau.Core.Ustx {
                 if (phonemizerResponse != null) {
                     var resp = phonemizerResponse;
                     if (resp.timestamp == notesTimestamp) {
+                        var oldPhonemes = phonemes.ToArray();
                         phonemes.Clear();
                         notes.ForEach(note => note.phonemizerExpressions.Clear());
-
                         for (int i = 0; i < resp.phonemes.Length; ++i) {
                             var indexes = new List<int>();
                             var note = notes.ElementAtOrDefault(resp.noteIndexes[i]);
@@ -192,9 +193,27 @@ namespace OpenUtau.Core.Ustx {
                             indexes.Sort();
                             note.phonemeIndexes = indexes.ToArray();
                         }
+
+                        bool sameLength = (phonemes.Count == oldPhonemes.Length);
+                        if (!updatePhonemes) {
+                            for (int i = 0; i < phonemes.Count; i++) {
+                                var phoneme = phonemes[i];
+
+                                if (i < oldPhonemes.Length) {
+                                    var oldPhoneme = oldPhonemes[i];
+                                    if (phoneme.rawPhoneme == oldPhoneme.rawPhoneme) {
+                                        phonemes[i].rawPosition = oldPhoneme.rawPosition;
+                                    } else {
+                                        if (!sameLength) break;
+                                    }
+                                }
+                            }
+                        }
+                        
                         phonemesTimestamp = resp.timestamp;
                     }
                     phonemizerResponse = null;
+                    updatePhonemes = false;
                 }
             }
             if (!options.SkipPhoneme) {
