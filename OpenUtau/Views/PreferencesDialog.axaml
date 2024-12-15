@@ -155,6 +155,10 @@
               <TextBlock Text="{DynamicResource prefs.rendering.skipmuted}" HorizontalAlignment="Left"/>
               <ToggleSwitch IsChecked="{Binding SkipRenderingMutedTracks}"/>
             </Grid>
+            <Grid>
+               <TextBlock Text="{DynamicResource prefs.rendering.keepphonemeslength}" HorizontalAlignment="Left"/>
+               <ToggleSwitch IsChecked="{Binding KeepPhonemesLength}"/>
+            </Grid>
           </StackPanel>
         </HeaderedContentControl>
         <HeaderedContentControl Classes="groupbox" Header="{DynamicResource prefs.appearance}">

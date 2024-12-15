@@ -458,6 +458,7 @@ Warning: this option removes custom presets.</system:String>
     Note: to use external resamplers, please add the resampler DLL or EXE file in the Resamplers folder in the OpenUtau install path and choose it in Preferences.
   </system:String>
   <system:String x:Key="prefs.rendering.skipmuted">Skip muted tracks</system:String>
+  <system:String x:Key="prefs.rendering.keepphonemeslength">Keep Phonemes Length</system:String>
   <system:String x:Key="prefs.rendering.threads.cpuwarn">
     Warning: too many render threads may cause OpenUtau to run slowly.
   </system:String>

@@ -9,6 +9,7 @@ using NWaves.Signals;
 using OpenUtau.Api;
 using OpenUtau.Core.Render;
 using OpenUtau.Core.SignalChain;
+using OpenUtau.Core.Util;
 using Serilog;
 using SharpCompress;
 using YamlDotNet.Serialization;
@@ -195,7 +196,7 @@ namespace OpenUtau.Core.Ustx {
                         }
 
                         bool sameLength = (phonemes.Count == oldPhonemes.Length);
-                        if (!updatePhonemes) {
+                        if (!updatePhonemes && Preferences.Default.KeepPhonemesLength) {
                             for (int i = 0; i < phonemes.Count; i++) {
                                 var phoneme = phonemes[i];
 

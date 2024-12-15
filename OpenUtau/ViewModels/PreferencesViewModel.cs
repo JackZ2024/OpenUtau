@@ -45,6 +45,7 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public int DiffSingerSteps { get; set; }
         [Reactive] public bool DiffSingerTensorCache { get; set; }
         [Reactive] public bool SkipRenderingMutedTracks { get; set; }
+        [Reactive] public bool KeepPhonemesLength { get; set; }
         [Reactive] public bool HighThreads { get; set; }
         [Reactive] public int Theme { get; set; }
         [Reactive] public bool PenPlusDefault { get; set; }
@@ -154,6 +155,7 @@ namespace OpenUtau.App.ViewModels {
             DiffSingerSteps = Preferences.Default.DiffSingerSteps;
             DiffSingerTensorCache = Preferences.Default.DiffSingerTensorCache;
             SkipRenderingMutedTracks = Preferences.Default.SkipRenderingMutedTracks;
+            KeepPhonemesLength = Preferences.Default.KeepPhonemesLength;
             Theme = Preferences.Default.Theme;
             PenPlusDefault = Preferences.Default.PenPlusDefault;
             DegreeStyle = Preferences.Default.DegreeStyle;
@@ -374,6 +376,11 @@ namespace OpenUtau.App.ViewModels {
             this.WhenAnyValue(vm => vm.SkipRenderingMutedTracks)
                 .Subscribe(skipRenderingMutedTracks => {
                     Preferences.Default.SkipRenderingMutedTracks = skipRenderingMutedTracks;
+                    Preferences.Save();
+                });
+            this.WhenAnyValue(vm => vm.KeepPhonemesLength)
+                .Subscribe(keepPhonemesLength => {
+                    Preferences.Default.KeepPhonemesLength = keepPhonemesLength;
                     Preferences.Save();
                 });
             this.WhenAnyValue(vm => vm.UseNarrowTimeline)

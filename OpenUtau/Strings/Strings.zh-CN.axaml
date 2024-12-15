@@ -428,6 +428,7 @@
     注意: 将你选择的resampler exe 或者 dll 文件放入 Resamplers 文件夹中并在使用偏好中选择它.
   </system:String>
   <system:String x:Key="prefs.rendering.skipmuted">跳过静音音轨</system:String>
+  <system:String x:Key="prefs.rendering.keepphonemeslength">保留音素时长</system:String>
   <system:String x:Key="prefs.rendering.threads.cpuwarn">
     警告：渲染线程过多可能会导致OpenUtau运行缓慢
   </system:String>
