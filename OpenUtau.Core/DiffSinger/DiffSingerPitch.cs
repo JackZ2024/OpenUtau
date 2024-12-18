@@ -286,6 +286,30 @@ namespace OpenUtau.Core.DiffSinger
             pitchInputs.Add(NamedOnnxValue.CreateFromTensor("retake",
                 new DenseTensor<bool>(retake, new int[] { retake.Length }, false)
                 .Reshape(new int[] { 1, retake.Length })));
+
+            if (dsConfig.use_glide_embed) {
+                List<int> noteGlide = new List<int>();
+                var notes = note_midi;
+
+                for (int i = 0; i < notes.Length; i++) {
+                    if (i < notes.Length - 1) {
+                        if (notes[i] == notes[i + 1]) {
+                            noteGlide.Add(0);
+                        } else if (notes[i] < notes[i + 1]) {
+                            noteGlide.Add(1);
+                        } else {
+                            noteGlide.Add(2);
+                        }
+                    }
+                }
+
+                noteGlide.Add(0);
+
+                pitchInputs.Add(NamedOnnxValue.CreateFromTensor("note_glide",
+               new DenseTensor<Int64>(noteGlide.Select(x => (Int64)x).ToArray(), new int[] { noteGlide.Count }, false)
+               .Reshape(new int[] { 1, noteGlide.Count })));
+            }
+            
             var steps = Preferences.Default.DiffSingerSteps;
             if (dsConfig.useContinuousAcceleration) {
                 pitchInputs.Add(NamedOnnxValue.CreateFromTensor("steps",
