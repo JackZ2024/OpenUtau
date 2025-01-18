@@ -64,10 +64,11 @@ namespace OpenUtau.Api {
             return Dict.IsGlide(symbol);
         }
 
-        public string[] Query(string grapheme) {
+        public virtual string[] Query(string grapheme) {
             if (grapheme.Length == 0 || kAllPunct.IsMatch(grapheme)) {
                 return null;
             }
+
             var phonemes = Dict.Query(grapheme);
             if (phonemes == null && !PredCache.TryGetValue(grapheme, out phonemes)) {
                 phonemes = Predict(grapheme);
