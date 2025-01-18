@@ -159,5 +159,12 @@ namespace OpenUtau.Core.G2p.Data {
                 return ((byte[])(obj));
             }
         }
+
+         internal static byte[] g2p_fr_millefeuille {
+            get {
+                object obj = ResourceManager.GetObject("g2p-fr-millefeuille", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }
