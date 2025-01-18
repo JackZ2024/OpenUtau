@@ -31,6 +31,11 @@ namespace OpenUtau.App.Controls {
                 nameof(IsKeyboard),
                 o => o.IsKeyboard,
                 (o, v) => o.IsKeyboard = v);
+        public static readonly DirectProperty<TrackBackground, int> KeyProperty =
+            AvaloniaProperty.RegisterDirect<TrackBackground, int>(
+                nameof(Key),
+                o => o.Key,
+                (o, v) => o.Key = v);
 
         public double TrackHeight {
             get => _trackHeight;
@@ -48,11 +53,16 @@ namespace OpenUtau.App.Controls {
             get => _isKeyboard;
             set => SetAndRaise(IsPianoRollProperty, ref _isKeyboard, value);
         }
+        public int Key {
+            get => _key;
+            set => SetAndRaise(KeyProperty, ref _key, value);
+        }
 
         private double _trackHeight;
         private double _trackOffset;
         private bool _isPianoRoll;
         private bool _isKeyboard;
+        private int _key;
         private int _tick;
 
         public TrackBackground() {
@@ -71,7 +81,8 @@ namespace OpenUtau.App.Controls {
             base.OnPropertyChanged(change);
             if (change.Property == TrackHeightProperty ||
                 change.Property == TrackOffsetProperty ||
-                change.Property == ForegroundProperty) {
+                change.Property == ForegroundProperty ||
+                change.Property == KeyProperty) {
                 InvalidateVisual();
             }
         }
