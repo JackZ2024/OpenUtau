@@ -406,6 +406,7 @@ namespace OpenUtau.App.ViewModels {
             TickOffset = Math.Clamp(tickOffset, 0, HScrollBarMax);
             Notify();
         }
+
         public void OnYZoomed(Point position, double delta) {
             double center = TrackOffset + position.Y * ViewportTracks;
             double trackHeight = TrackHeight * (1.0 + delta * 2);
