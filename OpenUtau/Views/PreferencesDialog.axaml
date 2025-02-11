@@ -130,6 +130,8 @@
             <TextBlock Text="{DynamicResource prefs.penplus}" HorizontalAlignment="Left"/>
             <ToggleSwitch IsChecked="{Binding PenPlusDefault}"/>
                 </Grid>
+                <TextBlock Text="{DynamicResource prefs.breathnots}" Margin="0,10,0,10" HorizontalAlignment="Left"/>
+                <TextBox Name="TextBox" Text="{Binding BreathNoteString}"/>
             </StackPanel>
 
         <!-- Rendering -->

@@ -301,6 +301,8 @@
   <system:String x:Key="pianoroll.menu.notedefaults">音符设置</system:String>
   <system:String x:Key="pianoroll.menu.notes">音符</system:String>
   <system:String x:Key="pianoroll.menu.notes.addbreath">添加呼吸</system:String>
+  <system:String x:Key="pianoroll.menu.notes.deleteallbreath">删除呼吸(所有)</system:String>
+  <system:String x:Key="pianoroll.menu.notes.deletebreathonlyselected">删除呼吸(仅选择范围内)</system:String>
   <system:String x:Key="pianoroll.menu.notes.addtaildash">添加尾部"-"音符</system:String>
   <system:String x:Key="pianoroll.menu.notes.addtailrest">添加尾部"R"音符</system:String>
   <system:String x:Key="pianoroll.menu.notes.autolegato">自动连奏</system:String>
@@ -423,6 +425,7 @@
   <system:String x:Key="prefs.paths.reset">清除</system:String>
   <system:String x:Key="prefs.paths.select">选择</system:String>
   <system:String x:Key="prefs.penplus">默认使用笔（增强）工具</system:String>
+  <system:String x:Key="prefs.breathnots">设置呼吸字符(用","分割多个字符)</system:String>
   <system:String x:Key="prefs.playback">回放</system:String>
   <system:String x:Key="prefs.playback.autoscroll">自动滚动</system:String>
   <system:String x:Key="prefs.playback.autoscrollmode">自动滚动模式</system:String>

@@ -301,6 +301,8 @@ Warning: this option removes custom presets.</system:String>
   <system:String x:Key="pianoroll.menu.notedefaults">Note Defaults</system:String>
   <system:String x:Key="pianoroll.menu.notes">Notes</system:String>
   <system:String x:Key="pianoroll.menu.notes.addbreath">Add breath</system:String>
+  <system:String x:Key="pianoroll.menu.notes.deleteallbreath">Del all breath</system:String>
+  <system:String x:Key="pianoroll.menu.notes.deletebreathonlyselected">Del breath selected</system:String>
   <system:String x:Key="pianoroll.menu.notes.addtaildash">Add tail "-"</system:String>
   <system:String x:Key="pianoroll.menu.notes.addtailrest">Add tail "R"</system:String>
   <system:String x:Key="pianoroll.menu.notes.autolegato">Auto Legato</system:String>
@@ -427,6 +429,7 @@ Warning: this option removes custom presets.</system:String>
   <system:String x:Key="prefs.paths.reset">Reset</system:String>
   <system:String x:Key="prefs.paths.select">Select</system:String>
   <system:String x:Key="prefs.penplus">Set Pen Plus Tool as Default</system:String>
+  <system:String x:Key="prefs.breathnots">Set Breath Notes(Separate multiple notes with ",")</system:String>
   <system:String x:Key="prefs.playback">Playback</system:String>
   <system:String x:Key="prefs.playback.autoscroll">Auto-Scroll</system:String>
   <system:String x:Key="prefs.playback.autoscrollmode">Auto-Scroll Mode</system:String>

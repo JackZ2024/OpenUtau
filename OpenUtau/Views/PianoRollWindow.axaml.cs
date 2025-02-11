@@ -188,6 +188,20 @@ namespace OpenUtau.App.Views {
                     AddBreathNote();
                 })
             });
+            ViewModel.NoteBatchEdits.Insert(6, new MenuItemViewModel() {
+                Header = ThemeManager.GetString("pianoroll.menu.notes.deleteallbreath"),
+                InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.deleteallbreath") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.deleteallbreath"]) : null,
+                Command = ReactiveCommand.Create(() => {
+                    DelBreathNote(true);
+                })
+            });
+            ViewModel.NoteBatchEdits.Insert(7, new MenuItemViewModel() {
+                Header = ThemeManager.GetString("pianoroll.menu.notes.deletebreathonlyselected"),
+                InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.deletebreathonlyselected") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.deletebreathonlyselected"]) : null,
+                Command = ReactiveCommand.Create(() => {
+                    DelBreathNote(false);
+                })
+            });
             ViewModel.NoteBatchEdits.Add(new MenuItemViewModel() {
                 Header = ThemeManager.GetString("pianoroll.menu.notes.lengthencrossfade"),
                 InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.lengthencrossfade") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.lengthencrossfade"]) : null,
@@ -447,6 +461,41 @@ namespace OpenUtau.App.Views {
             };
             dialog.SetText("br");
             dialog.ShowDialog(this);
+        }
+        void DelBreathNote(bool all=true) {
+            var notesVM = ViewModel.NotesViewModel;
+            if (notesVM.Part == null) {
+                return;
+            }
+            if (!all && notesVM.Selection.IsEmpty) {
+                _ = MessageBox.Show(
+                    this,
+                    ThemeManager.GetString("lyrics.selectnotes"),
+                    ThemeManager.GetString("lyrics.caption"),
+                    MessageBox.MessageBoxButtons.Ok);
+                return;
+            }
+
+            var notes = notesVM.Selection.ToList();
+            if(all) {
+                notes = notesVM.Part.notes.ToList();
+            }
+            
+            List<UNote> breaths = new List<UNote>();
+            if (notes == null) { return; }
+            var breathNotes = Preferences.Default.BreathNoteString.Split(",");
+            foreach (UNote note in notes) {
+                foreach(var breathNote in breathNotes) {
+                    if(breathNote != "" && note.lyric == breathNote) {
+                        breaths.Add(note);
+                        break;
+                    }
+                }
+            }
+
+            DocManager.Inst.StartUndoGroup();
+            DocManager.Inst.ExecuteCmd(new RemoveNoteCommand(notesVM.Part, breaths));
+            DocManager.Inst.EndUndoGroup();
         }
 
         void LengthenCrossfade() {
