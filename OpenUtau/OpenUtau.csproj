@@ -48,7 +48,7 @@
             </dict>
         </array>          
   </CFBundleDocumentTypes>
-    <AssemblyVersion>0.1.547.3</AssemblyVersion>
+    <AssemblyVersion>0.1.547.4</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

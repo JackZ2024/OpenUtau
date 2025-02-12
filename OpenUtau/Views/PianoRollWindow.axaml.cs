@@ -471,31 +471,40 @@ namespace OpenUtau.App.Views {
                 _ = MessageBox.Show(
                     this,
                     ThemeManager.GetString("lyrics.selectnotes"),
-                    ThemeManager.GetString("lyrics.caption"),
+                    ThemeManager.GetString("pianoroll.menu.notes.deletebreathonlyselected"),
                     MessageBox.MessageBoxButtons.Ok);
                 return;
             }
 
-            var notes = notesVM.Selection.ToList();
-            if(all) {
-                notes = notesVM.Part.notes.ToList();
-            }
-            
-            List<UNote> breaths = new List<UNote>();
-            if (notes == null) { return; }
-            var breathNotes = Preferences.Default.BreathNoteString.Split(",");
-            foreach (UNote note in notes) {
-                foreach(var breathNote in breathNotes) {
-                    if(breathNote != "" && note.lyric == breathNote) {
-                        breaths.Add(note);
-                        break;
+            var dialog = new TypeInDialog() {
+                Title = all ? ThemeManager.GetString("pianoroll.menu.notes.deleteallbreath") : 
+                                ThemeManager.GetString("pianoroll.menu.notes.deletebreathonlyselected"),
+                onFinish = value => {
+                    Console.WriteLine(value);
+                    var notes = notesVM.Selection.ToList();
+                    if (all) {
+                        notes = notesVM.Part.notes.ToList();
                     }
-                }
-            }
 
-            DocManager.Inst.StartUndoGroup();
-            DocManager.Inst.ExecuteCmd(new RemoveNoteCommand(notesVM.Part, breaths));
-            DocManager.Inst.EndUndoGroup();
+                    List<UNote> breaths = new List<UNote>();
+                    if (notes == null) { return; }
+                    var breathNotes = value.Replace("，", ",").Split(",");
+                    foreach (UNote note in notes) {
+                        foreach (var breathNote in breathNotes) {
+                            if (breathNote != "" && note.lyric == breathNote) {
+                                breaths.Add(note);
+                                break;
+                            }
+                        }
+                    }
+
+                    DocManager.Inst.StartUndoGroup();
+                    DocManager.Inst.ExecuteCmd(new RemoveNoteCommand(notesVM.Part, breaths));
+                    DocManager.Inst.EndUndoGroup();
+                }
+            };
+            dialog.SetText(Preferences.Default.BreathNoteString);
+            dialog.ShowDialog(this);
         }
 
         void LengthenCrossfade() {
