@@ -678,6 +678,57 @@ namespace OpenUtau.App.Views {
         public void TimelinePointerReleased(object sender, PointerReleasedEventArgs args) {
             args.Pointer.Capture(null);
         }
+        public void TimeDoubleTapped(object sender, TappedEventArgs args) {
+            if (!(sender is Control control)) {
+                return;
+            }
+            var element = (TextBlock)sender;
+            var notesVM = ViewModel.NotesViewModel;
+            if (notesVM.Part == null) {
+                return;
+            }
+            var dialog = new TimeInDialog() {
+                Title = ThemeManager.GetString("pianoroll.toggle.seekto"),
+                onFinish = value => {
+
+                    double milliseconds = -1;
+                    try {
+                        string timeString = value.Replace("：", ":");
+                        string[] parts = timeString.Split(':');
+                        int hours = 0;
+                        int minutes = 0;
+                        double seconds = 0;
+
+                        if (parts.Length == 3) {
+                            hours = int.Parse(parts[0]);
+                            minutes = int.Parse(parts[1]);
+                            seconds = double.Parse(parts[2]);
+                            
+                        } else if (parts.Length == 2) {
+                            minutes = int.Parse(parts[0]);
+                            seconds = double.Parse(parts[1]);
+                        }
+                        milliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
+                    } catch (Exception) {
+                        milliseconds = -1;
+                    }
+
+                    if(milliseconds >=0) {
+                        var tick = notesVM.Project.timeAxis.MsPosToTickPos(milliseconds);
+                        if (tick < notesVM.Part.End) {
+                            ViewModel.PlaybackViewModel?.MovePlayPos(tick);
+                        }
+                    }
+                }
+            };
+            if(element.Text != null) {
+                dialog.SetText(element.Text);
+            }
+            else {
+                dialog.SetText("00:00.000");
+            }
+            dialog.ShowDialog(this);
+        }
         private void HandleShowRemark(object? sender, EventArgs e) {
             var remarkHitInfo = ViewModel.NotesViewModel.HitTest.HitTestRemark(lastPoint);
             if (remarkHitInfo.OnPoint) {

@@ -353,6 +353,7 @@ Warning: this option removes custom presets.</system:String>
   <system:String x:Key="pianoroll.toggle.Metronome">Metronome</system:String>
   <system:String x:Key="pianoroll.toggle.EditCurve">Edit Curve Points (Ctrl+E)</system:String>
   <system:String x:Key="pianoroll.toggle.lockStartTime">Lock Start Time</system:String>
+  <system:String x:Key="pianoroll.toggle.seekto">Seek To</system:String>
   <system:String x:Key="pianoroll.tool.drawlinepitch">
     Line Draw Pitch Tool (Shift + 4)
     Left click to draw (draw straight line)

@@ -353,6 +353,7 @@
   <system:String x:Key="pianoroll.toggle.Metronome">节拍器</system:String>
   <system:String x:Key="pianoroll.toggle.EditCurve">编辑曲线点 (Ctrl+E)</system:String>
   <system:String x:Key="pianoroll.toggle.lockStartTime">锁定开始时间</system:String>
+  <system:String x:Key="pianoroll.toggle.seekto">跳转到</system:String>
   <!--<system:String x:Key="pianoroll.tool.drawlinepitch">
     Line Draw Pitch Tool (Shift + 4)
     Left click to draw (draw straight line)

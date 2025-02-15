@@ -599,7 +599,8 @@
             </ToggleButton>
             <Border Classes="playback" Width="72" HorizontalAlignment="Right" Margin="4,0">
               <Grid>
-                <TextBlock Text="{Binding Path=PlaybackViewModel.PlayPosTime, StringFormat={}{0:mm\\:ss\\.fff}}"/>
+                <TextBlock Text="{Binding Path=PlaybackViewModel.PlayPosTime, StringFormat={}{0:mm\\:ss\\.fff}}" 
+                           DoubleTapped="TimeDoubleTapped"/>
               </Grid>
             </Border>
           </StackPanel>
