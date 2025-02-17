@@ -716,9 +716,10 @@ namespace OpenUtau.App.Views {
                     if(milliseconds >=0) {
                         var tick = notesVM.Project.timeAxis.MsPosToTickPos(milliseconds);
                         if (tick < notesVM.Part.End) {
+                            var realTick = tick - notesVM.Part.position;
                             ViewModel.PlaybackViewModel?.MovePlayPos(tick);
-                            notesVM.TickOffset = tick - notesVM.ViewportTicks / 2;
-                            notesVM.PlayPosHighlightX = notesVM.TickToneToPoint(tick, 0).X;
+                            notesVM.TickOffset = realTick - notesVM.ViewportTicks / 2;
+                            notesVM.PlayPosHighlightX = notesVM.TickToneToPoint(realTick, 0).X;
                         }
                     }
                 }
