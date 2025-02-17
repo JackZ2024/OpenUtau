@@ -51,6 +51,7 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public double TickOffset { get; set; }
         [Reactive] public double TrackOffset { get; set; }
         [Reactive] public int SnapDiv { get; set; }
+        [Reactive] public int Key { get; set; }
         public ObservableCollectionExtended<int> SnapTicks { get; } = new ObservableCollectionExtended<int>();
         [Reactive] public double PlayPosX { get; set; }
         [Reactive] public double PlayPosHighlightX { get; set; }
@@ -130,6 +131,7 @@ namespace OpenUtau.App.ViewModels {
         private string? portraitSource;
         private readonly object portraitLock = new object();
         private int userSnapDiv = -2;
+        //private int userKey => Project.key;
 
         private int _wavShapeBorderHeight = 60;
         [Reactive] public int WavShapeBorderHeight {
@@ -404,6 +406,7 @@ namespace OpenUtau.App.ViewModels {
             TickOffset = Math.Clamp(tickOffset, 0, HScrollBarMax);
             Notify();
         }
+
         public void OnYZoomed(Point position, double delta) {
             double center = TrackOffset + position.Y * ViewportTracks;
             double trackHeight = TrackHeight * (1.0 + delta * 2);

@@ -235,7 +235,8 @@ namespace OpenUtau.App.Views {
                 FilePicker.VSQX,
                 FilePicker.UST,
                 FilePicker.MIDI,
-                FilePicker.UFDATA);
+                FilePicker.UFDATA,
+                FilePicker.MUSICXML);
             if (files == null || files.Length == 0) {
                 return;
             }
@@ -329,7 +330,8 @@ namespace OpenUtau.App.Views {
                 FilePicker.VSQX,
                 FilePicker.UST,
                 FilePicker.MIDI,
-                FilePicker.UFDATA);
+                FilePicker.UFDATA,
+                FilePicker.MUSICXML);
             if (files == null || files.Length == 0) {
                 return;
             }
@@ -663,6 +665,12 @@ namespace OpenUtau.App.Views {
             }
         }
 
+        void OnMenuFullScreen(object sender, RoutedEventArgs args) {
+            this.WindowState = this.WindowState == WindowState.FullScreen
+                ? WindowState.Normal
+                : WindowState.FullScreen;
+        }
+
         void OnMenuClearCache(object sender, RoutedEventArgs args) {
             Task.Run(() => {
                 DocManager.Inst.ExecuteCmd(new ProgressBarNotification(0, "Clearing cache..."));
@@ -799,6 +807,9 @@ namespace OpenUtau.App.Views {
                             viewModel.PlaybackViewModel.MovePlayPos(endTick);
                         }
                         break;
+                    case Key.F11:
+                        OnMenuFullScreen(this, new RoutedEventArgs());
+                        break;
                     default:
                         args.Handled = false;
                         break;
@@ -875,8 +886,8 @@ namespace OpenUtau.App.Views {
                 return;
             }
             string file = storageItem.Path.LocalPath;
-            var ext = Path.GetExtension(file);
-            if (ext == ".ustx" || ext == ".ust" || ext == ".vsqx" || ext == ".ufdata") {
+            var ext = Path.GetExtension(file).ToLower();
+            if (ext == ".ustx" || ext == ".ust" || ext == ".vsqx" || ext == ".ufdata" || ext == ".musicxml") {
                 if (!DocManager.Inst.ChangesSaved && !await AskIfSaveAndContinue()) {
                     return;
                 }

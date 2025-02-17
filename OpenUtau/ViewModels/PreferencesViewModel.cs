@@ -106,6 +106,7 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public bool RememberUst{ get; set; }
         [Reactive] public bool RememberVsqx{ get; set; }
         [Reactive] public int ImportTempo{ get; set; }
+        [Reactive] public string BreathNoteString { get; set; }
 
         private List<AudioOutputDevice>? audioOutputDevices;
         private AudioOutputDevice? audioOutputDevice;
@@ -173,7 +174,8 @@ namespace OpenUtau.App.ViewModels {
             ImportTempo = Preferences.Default.ImportTempo;
             ClearCacheOnQuit = Preferences.Default.ClearCacheOnQuit;
             UseNarrowTimeline = Preferences.Default.UseNarrowTimeline;
-            TimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
+            TimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor); 
+            BreathNoteString = Preferences.Default.BreathNoteString;
 
             _colors = new List<IBrush>
             {
@@ -396,6 +398,11 @@ namespace OpenUtau.App.ViewModels {
                    Preferences.Default.NarrowTimelineColor = color.ToString();
                    Preferences.Save();
                    MessageBus.Current.SendMessage(new TimelineRefreshEvent());
+               });
+            this.WhenAnyValue(vm => vm.BreathNoteString)
+               .Subscribe(breathnotes => {
+                   Preferences.Default.BreathNoteString = breathnotes.Replace("，", ",");
+                   Preferences.Save();
                });
         }
 
