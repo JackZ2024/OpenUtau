@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using OpenUtau.App.ViewModels;
 using OpenUtau.Core;
 using ReactiveUI.Fody.Helpers;
 

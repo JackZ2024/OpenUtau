@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.IO;
 using System.Timers;
@@ -20,7 +21,7 @@ namespace OpenUtau.Core.Metronome {
         }
 
         // Output device and mixer
-        private readonly WaveOut outputDevice;
+        public Audio.IAudioOutput outputDevice { get; set; } = new Audio.DummyAudioOutput();
         private MixingSampleProvider mixer;
         // Beat pattern
         public string AccentedBeatPath { get; set; } = "Metronome/SnareHi.wav";
@@ -121,7 +122,19 @@ namespace OpenUtau.Core.Metronome {
             normalVolumeProvider = new VolumeSampleProvider(new SampleSourceProvider(NormalPattern));
 
             // Create output device and mixer
-            outputDevice = new WaveOut();
+            if (!OS.IsWindows() || Util.Preferences.Default.PreferPortAudio) {
+                try {
+                    outputDevice = new Audio.MiniAudioOutput();
+                } catch (Exception e1) {
+                    Log.Error(e1, "Failed to init MiniAudio");
+                }
+            } else {
+                try {
+                    outputDevice = new Audio.NAudioOutput();
+                } catch (Exception e2) {
+                    Log.Error(e2, "Failed to init NAudio");
+                }
+            }
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, patternEngine.AccentedBeat.WaveFormat.Channels));
             mixer.ReadFully = true;
             outputDevice.Init(mixer);

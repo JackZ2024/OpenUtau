@@ -1,9 +1,12 @@
 import os
 import sys
 from datetime import datetime
+import platform
 
-appcast_ver = os.environ.get('APPVEYOR_BUILD_VERSION')
-
+# appcast_ver = os.environ.get('APPVEYOR_BUILD_VERSION')
+appcast_ver = "0.1.547.7"
+if len(sys.argv) > 1:
+    appcast_ver = sys.argv[1]
 
 def write_appcast(appcast_os, appcast_rid, appcast_file):
 
@@ -15,7 +18,7 @@ def write_appcast(appcast_os, appcast_rid, appcast_file):
     <item>
     <title>OpenUtau %s</title>
     <pubDate>%s</pubDate>
-    <enclosure url="https://github.com/stakira/OpenUtau/releases/download/build%%2F%s/%s"
+    <enclosure url="https://github.com/stakira/OpenUtau/releases/download/%s/%s"
                 sparkle:version="%s"
                 sparkle:shortVersionString="%s"
                 sparkle:os="%s"
@@ -60,24 +63,28 @@ if sys.platform == 'win32':
 elif sys.platform == 'darwin':
     os.system("rm *.dmg")
     os.system("rm *.xml")
+    appcast_rid = "osx-x64"
+    if platform.machine() == 'arm64':
+        appcast_rid = "osx-arm64"
 
-    os.system("git checkout OpenUtau/OpenUtau.csproj")
-    os.system("rm LICENSE.txt")
-    os.system(
-        "sed -i '' \"s/0.0.0/%s/g\" OpenUtau/OpenUtau.csproj" % (appcast_ver))
-    os.system("dotnet restore OpenUtau -r osx.10.14-x64")
-    os.system("dotnet msbuild OpenUtau -t:BundleApp -p:Configuration=Release -p:RuntimeIdentifier=osx.10.14-x64 -p:UseAppHost=true -p:OutputPath=../bin/osx-x64/")
-    os.system(
-        "cp OpenUtau/Assets/OpenUtau.icns bin/osx-x64/publish/OpenUtau.app/Contents/Resources/")
+    # os.system("git checkout OpenUtau/OpenUtau.csproj")
+    # os.system("rm LICENSE.txt")
+    os.system("sed -i '' \"s/0.0.0/%s/g\" OpenUtau/OpenUtau.csproj" % (appcast_ver))
+    os.system(f"dotnet restore OpenUtau -r {appcast_rid}")
+    os.system(f"dotnet msbuild OpenUtau -t:BundleApp -p:Configuration=Release -p:RuntimeIdentifier={appcast_rid} \
+              -p:UseAppHost=true -p:OutputPath=../bin/{appcast_rid}/ -p:PublishReadyToRun=false")
+    
+    os.system(f"cp OpenUtau/Assets/OpenUtau.icns bin/{appcast_rid}/publish/OpenUtau.app/Contents/Resources/")
     os.system("rm *.dmg")
-    os.system("npm install -g create-dmg")
-    os.system("create-dmg bin/osx-x64/publish/OpenUtau.app")
-    os.system("mv *.dmg OpenUtau-osx-x64.dmg")
-    os.system("codesign -fvs - OpenUtau-osx-x64.dmg")
-    os.system("git checkout OpenUtau/OpenUtau.csproj")
-    os.system("git checkout LICENSE.txt")
+    # 这个命令只需要执行一次，并且需要管理员权限，需要单独执行
+    # os.system("npm install -g create-dmg")
+    os.system(f"create-dmg bin/{appcast_rid}/publish/OpenUtau.app")
+    os.system(f"mv *.dmg OpenUtau-{appcast_rid}.dmg")
+    os.system(f"codesign -fvs - OpenUtau-{appcast_rid}.dmg")
+    # os.system("git checkout OpenUtau/OpenUtau.csproj")
+    # os.system("git checkout LICENSE.txt")
 
-    write_appcast("macos", "osx-x64", "OpenUtau-osx-x64.dmg")
+    write_appcast("macos", appcast_rid, f"OpenUtau-{appcast_rid}.dmg")
 
 else:
     os.system("rm *.xml")

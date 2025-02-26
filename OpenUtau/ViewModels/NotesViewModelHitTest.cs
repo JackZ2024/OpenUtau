@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
-using Melanchall.DryWetMidi.Tools;
 using OpenUtau.App.Controls;
 using OpenUtau.Core;
 using OpenUtau.Core.Ustx;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace OpenUtau.App.ViewModels {
     public struct NoteHitInfo {

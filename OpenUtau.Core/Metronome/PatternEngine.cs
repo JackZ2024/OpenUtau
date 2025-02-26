@@ -22,7 +22,7 @@ namespace OpenUtau.Core.Metronome {
 
         private long GetBeatLength(WaveFormat waveFormat)
         {
-            return (long)(waveFormat.SampleRate * waveFormat.Channels * (waveFormat.BitsPerSample / 8) * BeatDuration);
+            return (long)(waveFormat.SampleRate * waveFormat.Channels * 4 * BeatDuration);
         }
 
         public SampleSource CreatePattern(int bpm, int beats, int noteLength)  // Remove?

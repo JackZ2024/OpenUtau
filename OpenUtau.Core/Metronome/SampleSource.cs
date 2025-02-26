@@ -12,14 +12,11 @@ namespace OpenUtau.Core.Metronome {
 
         public SampleSource(string audioFileName)
         {
-            AudioFileReader reader = new AudioFileReader(audioFileName);
-            using (reader)
-            {
-                WaveFormat = reader.WaveFormat;
-                Length = reader.Length; 
-                Duration = (double)Length / (WaveFormat.SampleRate * WaveFormat.Channels * (WaveFormat.BitsPerSample / 8)); 
-                AudioData = new float[Length];
-                reader.Read(AudioData, 0, (int)Length);
+            using (var waveStream = Format.Wave.OpenFile(audioFileName)) {
+                WaveFormat = waveStream.WaveFormat;
+                Length = waveStream.Length;
+                Duration = (double)Length / (WaveFormat.SampleRate * WaveFormat.Channels * (WaveFormat.BitsPerSample / 8));
+                AudioData = Format.Wave.GetStereoSamples(waveStream);
             }
         }
 
