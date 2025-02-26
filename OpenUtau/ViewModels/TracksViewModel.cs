@@ -445,6 +445,11 @@ namespace OpenUtau.App.ViewModels {
                     if (!setPlayPosTick.pause || Preferences.Default.LockStartTime == 1) {
                         MaybeAutoScroll();
                     }
+                } else if (cmd is LoadPartNotification loadPartNotif) {
+                    if (SelectedParts.Count != 1 || SelectedParts.First() != loadPartNotif.part) {
+                        DeselectParts();
+                        SelectPart(loadPartNotif.part);
+                    }
                 }
                 Notify();
             }
