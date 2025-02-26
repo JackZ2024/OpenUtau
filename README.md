@@ -84,3 +84,28 @@ See the [Getting-Started Wiki page](https://github.com/stakira/OpenUtau/wiki/Get
 ### What it doesn't do
 - While OpenUtau can do very minimal mixing, it will not replace your digital audio workstation of choice.
 - OpenUtau does not aim for Vocaloid compatibility, except for some limited features.
+
+### 在官方原版的基础上新增的功能
+- 添加节拍器
+- 添加几个常用快捷键：加载音高渲染结果(Ctrl+R);自动连奏(Ctrl+L);重置滑音(Alt+B);重置表情(Alt+E);清除颤音(Alit+C);重置颤音(Alt+R)
+- 添加曲线编辑功能，可以通过调整点来编辑曲线
+- 添加标签功能，可以给指定位置添加标签说明
+- 把暂停后动作的功能放到工具栏
+- 添加合并音符的功能
+- 实现更灵活的音轨范围调整
+- 添加仅加载选择音符音高的功能
+- 添加缩放音频波形的功能，可以把音频波形放大，利于观察
+- 添加调号标签功能
+- 实现时间改变时左边的调号显示也跟着更新的功能
+- 添加拖拽调整音轨顺序的功能
+- 添加时间线可以显示为单根线或者原来的宽时间线的切换
+- 在编辑界面显示时间码
+- 添加批量调整曲线值的功能
+- 平滑音高线功能减少平滑触发次数
+- 音高支持note_glide
+- 内置法语音素器
+- 添加批量删除气声的功能
+- 添加跳转到指定时间点的功能
+
+
+
