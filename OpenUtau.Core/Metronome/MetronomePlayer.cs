@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using Newtonsoft.Json;
+using OpenUtau.Core.SignalChain;
 using Serilog;
 using System;
 using System.IO;
@@ -23,6 +24,7 @@ namespace OpenUtau.Core.Metronome {
         // Output device and mixer
         public Audio.IAudioOutput outputDevice { get; set; } = new Audio.DummyAudioOutput();
         private MixingSampleProvider mixer;
+        private ISampleProvider? masterMix = null;
         // Beat pattern
         public string AccentedBeatPath { get; set; } = "Metronome/SnareHi.wav";
         public string NormalBeatPath { get; set; } = "Metronome/SnareLo.wav";
@@ -32,7 +34,6 @@ namespace OpenUtau.Core.Metronome {
         public VolumeSampleProvider accentedVolumeProvider { get; set; }
         public VolumeSampleProvider normalVolumeProvider { get; set; }
         // Metronome settings
-        public bool IsPlaying => outputDevice.PlaybackState == PlaybackState.Playing;
         public int MinBPM { get; set; } = 20;
         public int MaxBPM { get; set; } = 500;
         private int bpm = 120;
@@ -121,23 +122,8 @@ namespace OpenUtau.Core.Metronome {
             accentedVolumeProvider = new VolumeSampleProvider(new SampleSourceProvider(AccentedPattern));
             normalVolumeProvider = new VolumeSampleProvider(new SampleSourceProvider(NormalPattern));
 
-            // Create output device and mixer
-            if (!OS.IsWindows() || Util.Preferences.Default.PreferPortAudio) {
-                try {
-                    outputDevice = new Audio.MiniAudioOutput();
-                } catch (Exception e1) {
-                    Log.Error(e1, "Failed to init MiniAudio");
-                }
-            } else {
-                try {
-                    outputDevice = new Audio.NAudioOutput();
-                } catch (Exception e2) {
-                    Log.Error(e2, "Failed to init NAudio");
-                }
-            }
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, patternEngine.AccentedBeat.WaveFormat.Channels));
             mixer.ReadFully = true;
-            outputDevice.Init(mixer);
 
             if(settingsData != null) {
                 Volume = settingsData.Volume;
@@ -153,33 +139,53 @@ namespace OpenUtau.Core.Metronome {
                 Update();
             }
         }
+        public void UpdateOpenMetronome(bool open) {
+            OpenMetronome = open;
+            if (masterMix == null)
+                return;
 
-        public void Play()
+            bool needPause = false;
+            if (outputDevice.PlaybackState == PlaybackState.Playing) {
+                needPause = true;
+            }
+            if (needPause)
+                outputDevice.Pause();
+            if (OpenMetronome) {
+                mixer.RemoveAllMixerInputs();
+                mixer.AddMixerInput(accentedVolumeProvider);
+                mixer.AddMixerInput(normalVolumeProvider);
+                mixer.AddMixerInput(masterMix);
+                outputDevice.Init(mixer);
+            } else {
+                mixer.RemoveAllMixerInputs();
+                outputDevice.Init(masterMix);
+            }
+            if (needPause)
+                outputDevice.Play();
+        }
+        public void UpdateMixer(Audio.IAudioOutput outputAudio, ISampleProvider masterAdapter)
         {
-            if (!IsPlaying && OpenMetronome) {
+            if (OpenMetronome) {
                 accentedVolumeProvider = new VolumeSampleProvider(new SampleSourceProvider(AccentedPattern));
                 normalVolumeProvider = new VolumeSampleProvider(new SampleSourceProvider(NormalPattern));
                 accentedVolumeProvider.Volume = Volume;
                 normalVolumeProvider.Volume = Volume;
+                mixer.RemoveAllMixerInputs();
                 mixer.AddMixerInput(accentedVolumeProvider);
                 mixer.AddMixerInput(normalVolumeProvider);
-                outputDevice.Play();
+                mixer.AddMixerInput(masterAdapter);
+                outputAudio.Init(mixer);
+            } else {
+                outputAudio.Init(masterAdapter);
             }
-        }
-        public void Stop()
-        {
-            if (IsPlaying) {
-                mixer.RemoveAllMixerInputs();
-                outputDevice.Stop();
-            }
+            outputDevice = outputAudio;
+            masterMix = masterAdapter;
         }
 
         public void Update()
         {
-            if (!IsPlaying) {
-                AccentedPattern = patternEngine.CreateAccentedBeatPattern(BPM, Beats, NoteLength);
-                NormalPattern = patternEngine.CreateNormalBeatPattern(BPM, Beats, NoteLength);
-            }
+            AccentedPattern = patternEngine.CreateAccentedBeatPattern(BPM, Beats, NoteLength);
+            NormalPattern = patternEngine.CreateNormalBeatPattern(BPM, Beats, NoteLength);
         }
 
         public void ApplyBeatSound(string accentedBeatPath, string normalBeatPath)
@@ -191,7 +197,6 @@ namespace OpenUtau.Core.Metronome {
 
             mixer = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(44100, patternEngine.AccentedBeat.WaveFormat.Channels));
             mixer.ReadFully = true;
-            outputDevice.Init(mixer);
 
             Update();
         }

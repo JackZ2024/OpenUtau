@@ -99,7 +99,7 @@ namespace OpenUtau.Audio {
                 CheckError(ou_audio_device_start(nativeContext));
             }
             PlaybackState = PlaybackState.Playing;
-            currentTimeMs = 0;
+            //currentTimeMs = 0;
             eof = false;
         }
 

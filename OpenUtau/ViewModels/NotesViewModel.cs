@@ -263,7 +263,7 @@ namespace OpenUtau.App.ViewModels {
 
             IsMetronomePlaying = false;
             MetronomePlay = ReactiveCommand.Create(() => {
-                MetronomePlayer.Instance.OpenMetronome = IsMetronomePlaying;
+                MetronomePlayer.Instance.UpdateOpenMetronome(IsMetronomePlaying);
             });
             IsEditCurve = false;
             EditCurveStart = ReactiveCommand.Create(() => {
