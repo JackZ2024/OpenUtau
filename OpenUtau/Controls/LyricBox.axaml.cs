@@ -13,6 +13,7 @@ namespace OpenUtau.App.Controls {
         private TextBox box;
         private ListBox listBox;
         private DispatcherTimer? focusTimer;
+        private bool isEsc = false;
 
         public LyricBox() {
             InitializeComponent();
@@ -27,6 +28,10 @@ namespace OpenUtau.App.Controls {
         }
 
         private void Box_LostFocus(object? sender, RoutedEventArgs e) {
+            if(!isEsc) {
+                EndEdit(true);
+            }
+            isEsc = false;
         }
 
         private void ListBox_KeyDown(object? sender, KeyEventArgs e) {
@@ -96,6 +101,7 @@ namespace OpenUtau.App.Controls {
                     e.Handled = true;
                     break;
                 case Key.Escape:
+                    isEsc = true;
                     EndEdit();
                     e.Handled = true;
                     break;
