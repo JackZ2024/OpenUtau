@@ -18,7 +18,7 @@ def write_appcast(appcast_os, appcast_rid, appcast_file):
     <item>
     <title>OpenUtau %s</title>
     <pubDate>%s</pubDate>
-    <enclosure url="https://github.com/stakira/OpenUtau/releases/download/%s/%s"
+    <enclosure url="https://github.com/JackZ2024/OpenUtau/releases/download/%s/%s"
                 sparkle:version="%s"
                 sparkle:shortVersionString="%s"
                 sparkle:os="%s"

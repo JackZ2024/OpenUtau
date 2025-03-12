@@ -279,59 +279,60 @@ namespace OpenUtau.Core.Analysis.Some {
             if(endTick > part.End){
                 part.Duration = endTick - part.position;
             }
+            if(OS.IsWindows()) {
+                IntPtr pdata = Marshal.AllocHGlobal(wavePart.Samples.Length * sizeof(float));
+                Marshal.Copy(wavePart.Samples, 0, pdata, wavePart.Samples.Length);
+                int retLength = 0;
+                double timeStep = 0;
+                IntPtr ret = GenPitch(pdata, wavePart.Samples.Length / wavePart.channels, wavePart.channels, 512, wavePart.sampleRate, ref retLength, ref timeStep);
+                Marshal.FreeHGlobal(pdata);
+                float[] f0 = new float[retLength];
+                Marshal.Copy(ret, f0, 0, retLength);
+                Marshal.FreeHGlobal(ret);
+                if (f0.Length > 0) {
+                    float minPitD = -1200;
+                    UExpressionDescriptor descriptor;
+                    if (project.expressions.TryGetValue(Format.Ustx.PITD, out descriptor)) {
+                        minPitD = descriptor.min;
+                    }
 
-            IntPtr pdata = Marshal.AllocHGlobal(wavePart.Samples.Length * sizeof(float));
-            Marshal.Copy(wavePart.Samples, 0, pdata, wavePart.Samples.Length);
-            int retLength = 0;
-            double timeStep = 0;
-            IntPtr ret = GenPitch(pdata, wavePart.Samples.Length / wavePart.channels, wavePart.channels, 512, wavePart.sampleRate, ref retLength, ref timeStep);
-            Marshal.FreeHGlobal(pdata);
-            float[] f0 = new float[retLength];
-            Marshal.Copy(ret, f0, 0, retLength);
-            Marshal.FreeHGlobal(ret);
-            if (f0.Length > 0) {
-                float minPitD = -1200;
-                UExpressionDescriptor descriptor;
-                if (project.expressions.TryGetValue(Format.Ustx.PITD, out descriptor)) {
-                    minPitD = descriptor.min;
-                }
+                    var curve = part.curves.FirstOrDefault(c => c.abbr == descriptor.abbr);
+                    if (curve == null) {
+                        curve = new UCurve(descriptor);
+                        part.curves.Add(curve);
+                    }
 
-                var curve = part.curves.FirstOrDefault(c => c.abbr == descriptor.abbr);
-                if (curve == null) {
-                    curve = new UCurve(descriptor);
-                    part.curves.Add(curve);
-                }
-
-                int? lastX = null;
-                int? lastY = null;
-                if (part.notes.Count > 0) {
-                    for (int i = 0; i < f0.Length; i++) {
-                        double curTimeMs = (i + 1) * timeStep * 1000 + partOffsetMs;
-                        var x = timeAxis.MsPosToTickPos(curTimeMs);
-                        var tickX = x - wavePart.position - wavePart.skipTicks;
-                        var notes = part.notes.ToArray();
-                        int basePitch = notes[0].tone;
-                        for (int j = 0; j < notes.Length - 1; j++) {
-                            var note = notes[j];
-                            var nextNote = notes[j + 1];
-                            if (tickX >= note.position && tickX <= note.End) {
-                                basePitch = note.tone * 100;
-                                break;
-                            } else if (tickX > note.End && tickX < nextNote.position) {
-                                basePitch = nextNote.tone * 100;
-                                break;
+                    int? lastX = null;
+                    int? lastY = null;
+                    if (part.notes.Count > 0) {
+                        for (int i = 0; i < f0.Length; i++) {
+                            double curTimeMs = (i + 1) * timeStep * 1000 + partOffsetMs;
+                            var x = timeAxis.MsPosToTickPos(curTimeMs);
+                            var tickX = x - wavePart.position - wavePart.skipTicks;
+                            var notes = part.notes.ToArray();
+                            int basePitch = notes[0].tone;
+                            for (int j = 0; j < notes.Length - 1; j++) {
+                                var note = notes[j];
+                                var nextNote = notes[j + 1];
+                                if (tickX >= note.position && tickX <= note.End) {
+                                    basePitch = note.tone * 100;
+                                    break;
+                                } else if (tickX > note.End && tickX < nextNote.position) {
+                                    basePitch = nextNote.tone * 100;
+                                    break;
+                                }
                             }
+                            int y = (int)(f0[i] * 100 - basePitch);
+                            lastX ??= tickX;
+                            lastY ??= y;
+                            if (y > minPitD) {
+                                int y1 = (int)Math.Clamp(y, descriptor.min, descriptor.max);
+                                int lastY1 = (int)Math.Clamp(lastY.Value, descriptor.min, descriptor.max);
+                                curve.Set(tickX, y1, lastX.Value, lastY1);
+                            }
+                            lastX = tickX;
+                            lastY = y;
                         }
-                        int y = (int)(f0[i] * 100 - basePitch);
-                        lastX ??= tickX;
-                        lastY ??= y;
-                        if (y > minPitD) {
-                            int y1 = (int)Math.Clamp(y, descriptor.min, descriptor.max);
-                            int lastY1 = (int)Math.Clamp(lastY.Value, descriptor.min, descriptor.max);
-                            curve.Set(tickX, y1, lastX.Value, lastY1);
-                        }
-                        lastX = tickX;
-                        lastY = y;
                     }
                 }
             }
