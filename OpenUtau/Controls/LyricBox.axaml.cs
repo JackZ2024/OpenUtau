@@ -28,10 +28,6 @@ namespace OpenUtau.App.Controls {
         }
 
         private void Box_LostFocus(object? sender, RoutedEventArgs e) {
-            if(!isEsc) {
-                EndEdit(true);
-            }
-            isEsc = false;
         }
 
         private void ListBox_KeyDown(object? sender, KeyEventArgs e) {
@@ -171,13 +167,17 @@ namespace OpenUtau.App.Controls {
         }
 
         public void EndEdit(bool commit = false) {
-            if (commit) {
+            if (viewModel.Text != "" && !isEsc) {
+                viewModel.Commit();
+            }
+            else if (commit) {
                 viewModel.Commit();
             }
             viewModel.Part = null;
             viewModel.NoteOrPhoneme = null;
             viewModel.IsVisible = false;
             viewModel.Text = string.Empty;
+            isEsc = false;
             TopLevel.GetTopLevel(this)?.FocusManager?.ClearFocus();
         }
     }
