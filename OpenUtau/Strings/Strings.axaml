@@ -150,6 +150,15 @@
   <system:String x:Key="remark.edit">Edit Remark</system:String>
   <system:String x:Key="remark.delete">Delete Remark</system:String>
   <system:String x:Key="remark.selectcolor">Select Color: </system:String>
+  <system:String x:Key="editbar.editbar">Edit Bars</system:String>
+  <system:String x:Key="editbar.startbar">Start Bar</system:String>
+  <system:String x:Key="editbar.barlength">Bars Count</system:String>
+  <system:String x:Key="editbar.editrange">Edit Range</system:String>
+  <system:String x:Key="editbar.edittype">Edit Type</system:String>
+  <system:String x:Key="editbar.curtrack">Current Track</system:String>
+  <system:String x:Key="editbar.alltrack">All Tracks</system:String>
+  <system:String x:Key="editbar.insertbar">Insert Bars</system:String>
+  <system:String x:Key="editbar.deletebar">Delete Bars</system:String>
 
   <system:String x:Key="lyricsreplace.after">After :</system:String>
   <system:String x:Key="lyricsreplace.before">Before :</system:String>

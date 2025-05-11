@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using NAudio.CoreAudioApi;
-using OpenUtau.Core.Ustx;
-using OpenUtau.Core.Util;
-using UtfUnknown.Core.Models.SingleByte.Vietnamese;
-using YamlDotNet.Core;
+﻿using OpenUtau.Core.Ustx;
+
 
 namespace OpenUtau.Core {
     public abstract class RemarkCommands : UCommand {

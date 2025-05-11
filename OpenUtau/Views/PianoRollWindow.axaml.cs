@@ -54,6 +54,8 @@ namespace OpenUtau.App.Views {
         public ReactiveCommand<RemarkHitInfo, Unit> RemarkCopyCommand;
         public ReactiveCommand<int, Unit> RemarkPasteCommand;
 
+        public ReactiveCommand<int, Unit> BarsEditCommand;
+
         public PianoRollWindow() {
             InitializeComponent();
             DataContext = ViewModel = new PianoRollViewModel();
@@ -262,6 +264,16 @@ namespace OpenUtau.App.Views {
                 DocManager.Inst.ExecuteCmd(new AddRemarkCommand(ViewModel.NotesViewModel.Part, CopyRemark));
                 DocManager.Inst.EndUndoGroup();
                 MessageBus.Current.SendMessage(new NotesRefreshEvent());
+            });
+
+            BarsEditCommand = ReactiveCommand.Create<int>(pos => {
+                if (ViewModel?.NotesViewModel.Part == null) { return; }
+                var vm = new EditBarsViewModel(ViewModel.NotesViewModel.Project, ViewModel.NotesViewModel.Part, pos);
+                vm.Title = ThemeManager.GetString("editbar.editbar");
+                var dialog = new EditBarsDialog() {
+                    DataContext = vm,
+                };
+                dialog.ShowDialog(this);
             });
 
             DocManager.Inst.AddSubscriber(this);
@@ -655,6 +667,14 @@ namespace OpenUtau.App.Views {
                         CommandParameter = tick,
                     });
                 }
+
+                int cur_tick = ViewModel.NotesViewModel.PointToTick(point.Position);
+                ViewModel.RemarkContextMenuItems.Add(new MenuItemViewModel() {
+                    Header = ThemeManager.GetString("editbar.editbar"),
+                    Command = BarsEditCommand,
+                    CommandParameter = cur_tick,
+                });
+
                 shouldOpenNotesContextMenu = true;
                 return;
             }

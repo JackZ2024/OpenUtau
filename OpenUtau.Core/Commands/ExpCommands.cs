@@ -529,15 +529,17 @@ namespace OpenUtau.Core {
             oldXs = curve?.xs.ToArray();
             oldYs = curve?.ys.ToArray();
         }
-        public override string ToString() => "Edit Curve";
+        public override string ToString() => "Delete Curve";
         public override void Execute() {
             var curve = Part.curves.FirstOrDefault(c => c.abbr == abbr);
             if (curve == null) {
                 return;
             }
+            List<int> indexs = selections.ToList();
+            indexs.Sort((a, b) => b.CompareTo(a));
 
-            for (int i = 0; i < selections.Length; i++) {
-                int index = selections[i];
+            for (int i = 0; i < indexs.Count; i++) {
+                int index = indexs[i];
                 curve.xs.RemoveAt(index);
                 curve.ys.RemoveAt(index);
             }

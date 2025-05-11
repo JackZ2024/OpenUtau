@@ -146,6 +146,15 @@
   <system:String x:Key="remark.edit">编辑备注</system:String>
   <system:String x:Key="remark.delete">删除备注</system:String>
   <system:String x:Key="remark.selectcolor">选择颜色: </system:String>
+  <system:String x:Key="editbar.editbar">处理小节</system:String>
+  <system:String x:Key="editbar.startbar">开始小节</system:String>
+  <system:String x:Key="editbar.barlength">小节长度</system:String>
+  <system:String x:Key="editbar.editrange">处理范围</system:String>
+  <system:String x:Key="editbar.edittype">处理类型</system:String>
+  <system:String x:Key="editbar.curtrack">当前轨道</system:String>
+  <system:String x:Key="editbar.alltrack">所有轨道</system:String>
+  <system:String x:Key="editbar.insertbar">插入小节</system:String>
+  <system:String x:Key="editbar.deletebar">删除小节</system:String>
 
   <system:String x:Key="lyricsreplace.after">替换为：</system:String>
   <system:String x:Key="lyricsreplace.before">查找内容：</system:String>

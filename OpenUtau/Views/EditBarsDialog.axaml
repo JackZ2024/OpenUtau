@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="using:OpenUtau.Controls"
+        mc:Ignorable="d" MinWidth="200" MinHeight="100" Width="300" Height="180"
+        x:Class="OpenUtau.App.Views.EditBarsDialog" WindowStartupLocation="CenterOwner"
+        xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+        Icon="/Assets/open-utau.ico"
+        Title="{Binding Title}"
+        KeyDown="OnKeyDown"
+        Opened="OnOpened">
+    <Window.Styles>
+        <StyleInclude Source="/Styles/PianoRollStyles.axaml"/>
+    </Window.Styles>
+    <Grid Margin="10,10,10,4" RowDefinitions="30, 30, 30, 30, Auto">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left">
+            <Label Grid.Row="0" Content="{StaticResource editbar.startbar}" Width="130" HorizontalAlignment="Left"/>
+            <c:IntEditor Grid.Row="0" Margin="0,0,0,4" Value="{Binding startBar}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left">
+            <Label Content="{StaticResource editbar.barlength}" Width="130" HorizontalAlignment="Left"/>
+            <c:IntEditor Margin="0,0,0,4" Value="{Binding barsCount}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left">
+            <Label Content="{StaticResource editbar.editrange}" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox SelectedIndex="{Binding handleRange}" Width="120" Height="25" VerticalAlignment="Center">
+                <ComboBoxItem Content="{StaticResource editbar.curtrack}"/>
+                <ComboBoxItem Content="{StaticResource editbar.alltrack}"/>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left">
+            <Label Content="{StaticResource editbar.edittype}" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <ComboBox SelectedIndex="{Binding handleType}" Width="120" Height="25" VerticalAlignment="Center">
+                <ComboBoxItem Content="{StaticResource editbar.insertbar}"/>
+                <ComboBoxItem Content="{StaticResource editbar.deletebar}"/>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Row="4" Margin="0,15,0,0" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+            <Button Content="{StaticResource lyrics.cancel}" Margin="0" Click="OnCancel"/>
+            <Button Content="{StaticResource lyrics.apply}" Margin="0" Click="OnFinish"/>
+        </StackPanel>
+    </Grid>
+</Window>
