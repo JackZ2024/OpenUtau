@@ -268,8 +268,12 @@ namespace OpenUtau.App.Views {
 
             BarsEditCommand = ReactiveCommand.Create<int>(pos => {
                 if (ViewModel?.NotesViewModel.Part == null) { return; }
-                var vm = new EditBarsViewModel(ViewModel.NotesViewModel.Project, ViewModel.NotesViewModel.Part, pos);
+                var vm = new EditBarsViewModel(ViewModel.NotesViewModel.Project, 
+                                                ViewModel.NotesViewModel.Part.trackNo, 
+                                                ViewModel.NotesViewModel.Part.position + pos);
                 vm.Title = ThemeManager.GetString("editbar.editbar");
+                vm.handleRange = 0;
+                vm.handleRangeEnable = true;
                 var dialog = new EditBarsDialog() {
                     DataContext = vm,
                 };

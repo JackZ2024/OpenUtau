@@ -1,12 +1,7 @@
 ﻿using OpenUtau.Core;
 using OpenUtau.Core.Ustx;
-using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
-using Avalonia.Media;
 using System.Collections.Generic;
-using System;
-using Melanchall.DryWetMidi.MusicTheory;
-using NumSharp.Utilities;
 
 namespace OpenUtau.App.ViewModels {
     class EditBarsViewModel : ViewModelBase {
@@ -14,32 +9,32 @@ namespace OpenUtau.App.ViewModels {
         public int barsCount { get; set; } = 2;
         public int handleRange { get; set; } = 0;
         public int handleType { get; set; } = 0;
+        public bool handleRangeEnable { get; set; } = true;
 
         private UProject project;
-        private UPart part;
+        private int trackNo;
         private int postion;
         private int barLength = 0;
         public string Title { get; set; } = "";
 
-        public EditBarsViewModel(UProject project, UPart part, int postion) {
+        public EditBarsViewModel(UProject project, int trackNo, int postion) {
             this.project = project;
-            this.part = part;
-            // 全局位置，不是part内的位置
-            this.postion = postion + part.position;
+            this.trackNo = trackNo;
+            this.postion = postion;
             this.project.timeAxis.TickPosToBarBeat(this.postion, out int timebar, out int _, out int _);
 
             startBar = timebar + 1;
-            barLength = this.project.timeAxis.GetBarLengthAtTick(postion);
+            barLength = this.project.timeAxis.GetBarLengthAtTick(this.postion);
         }
         public void DeleteBars() {
             if (this.project == null) { return; }
-            int startPos = (startBar - 1) * barLength;
+            int startPos = this.project.timeAxis.BarBeatToTickPos((startBar - 1), 0);
             int handleLen = barsCount * barLength;
 
             List<UVoicePart> handleParts = new List<UVoicePart>();
             foreach (var cur_part in this.project.parts) {
                 if (cur_part is not UVoicePart) continue;
-                if (handleRange == 0 && cur_part.trackNo != this.part.trackNo) {
+                if (handleRange == 0 && cur_part.trackNo != this.trackNo) {
                     continue;
                 }
                 if (cur_part.End < startPos) continue;
@@ -124,34 +119,59 @@ namespace OpenUtau.App.ViewModels {
                     DocManager.Inst.ExecuteCmd(new MovePartCommand(this.project, cur_part, cur_part.position - handleLen, cur_part.trackNo));
                 }
             }
+
+            // 移动timeSignatures、tempos、keys
+            if (handleRange != 0) {
+                for (int i = 0; i < this.project.timeSignatures.Count; i++) {
+                    var timeSignature = this.project.timeSignatures[i];
+                    if (timeSignature.barPosition > (startBar - 1) + barsCount) {
+                        DocManager.Inst.ExecuteCmd(new MoveTimeSigCommand(this.project, i, -barsCount));
+                    }
+                }
+                for (int i = 0; i < this.project.tempos.Count; i++) {
+                    var tempo = this.project.tempos[i];
+                    if (tempo.position > startPos + handleLen) {
+                        DocManager.Inst.ExecuteCmd(new MoveTempoChangeCommand(this.project, i, -handleLen));
+                    }
+                }
+                for (int i = 0; i < this.project.keys.Count; i++) {
+                    var key = this.project.keys[i];
+                    if (key.position > startPos + handleLen) {
+                        DocManager.Inst.ExecuteCmd(new MoveKeyChangeCommand(this.project, i, -handleLen));
+                    }
+                }
+            } 
         }
         public void InsertBars() {
             
             if (this.project == null) { return; }
-            int startPos = (startBar - 1) * barLength;
+            int startPos = this.project.timeAxis.BarBeatToTickPos((startBar - 1), 0);
             int handleLen = barsCount * barLength;
-
+            
+            // 获取要处理的part
             List<UVoicePart> handleParts = new List<UVoicePart>();
             foreach (var cur_part in this.project.parts) {
                 if (cur_part is not UVoicePart) continue;
-                if (handleRange == 0 && cur_part.trackNo != this.part.trackNo) {
+                if (handleRange == 0 && cur_part.trackNo != this.trackNo) {
                     continue;
                 }
                 if (cur_part.End < startPos) continue;
                 handleParts.Add((UVoicePart)cur_part);
             }
+            // 移动part
             foreach (var cur_part in handleParts) {
                 if (cur_part.position > startPos) {
                     // 如果part在要插入空白的后面，直接把part往后移就可以了
                     DocManager.Inst.ExecuteCmd(new MovePartCommand(this.project, cur_part, cur_part.position + handleLen, cur_part.trackNo));
                 }
             }
-
+            // 移动part内的东西
             foreach (var cur_part in handleParts) {
                 
                 if (cur_part.position <= startPos) {
                     // 如果要插入空白的位置在part中间，就需要细节处理，移动音符、标签、曲线等
                     DocManager.Inst.ExecuteCmd(new ResizePartCommand(this.project, cur_part, cur_part.duration + handleLen));
+                    // 移动音符
                     List<UNote> moveNotes = new List<UNote>();
                     foreach (var note in cur_part.notes) {
                         if (note.position + cur_part.position >= startPos) {
@@ -161,6 +181,8 @@ namespace OpenUtau.App.ViewModels {
                     if (moveNotes.Count > 0) {
                         DocManager.Inst.ExecuteCmd(new MoveNoteCommand(cur_part, moveNotes, handleLen, 0));
                     }
+
+                    // 移动remarts
                     for (int i = 0; i < cur_part.remarks.Count; i++) {
                         var remark = cur_part.remarks[i];
                         if (remark.position + cur_part.position >= startPos) {
@@ -168,6 +190,8 @@ namespace OpenUtau.App.ViewModels {
                             DocManager.Inst.ExecuteCmd(new MoveRemarkCommand(cur_part, remark, i, newPos));
                         }
                     }
+
+                    // 移动曲线
                     foreach (var curve in cur_part.curves) {
                         var xs = curve.xs.ToArray();
                         var ys = curve.ys.ToArray();
@@ -184,6 +208,28 @@ namespace OpenUtau.App.ViewModels {
                     }
                 }
             }
+
+            // 移动timeSignatures、tempos、keys
+            if (handleRange != 0) {
+                for (int i = 0; i < this.project.timeSignatures.Count; i++) {
+                    var timeSignature = this.project.timeSignatures[i];
+                    if (timeSignature.barPosition > (startBar - 1)) {
+                        DocManager.Inst.ExecuteCmd(new MoveTimeSigCommand(this.project, i, barsCount));
+                    }
+                }
+                for (int i = 0; i < this.project.tempos.Count; i++) {
+                    var tempo = this.project.tempos[i];
+                    if (tempo.position > startPos) {
+                        DocManager.Inst.ExecuteCmd(new MoveTempoChangeCommand(this.project, i, handleLen));
+                    }
+                }
+                for (int i = 0; i < this.project.keys.Count; i++) {
+                    var key = this.project.keys[i];
+                    if (key.position > startPos) {
+                        DocManager.Inst.ExecuteCmd(new MoveKeyChangeCommand(this.project, i, handleLen));
+                    }
+                }
+            }
         }
         public void Cancel() {
         }
@@ -195,7 +241,6 @@ namespace OpenUtau.App.ViewModels {
                 DeleteBars();
             }
             DocManager.Inst.EndUndoGroup();
-            MessageBus.Current.SendMessage(new NotesRefreshEvent());
             MessageBus.Current.SendMessage(new CurvesRefreshEvent());
         }
     }

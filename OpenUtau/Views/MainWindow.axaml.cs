@@ -64,6 +64,7 @@ namespace OpenUtau.App.Views {
             viewModel.DelTimeSigChangeCmd = ReactiveCommand.Create<int>(bar => DelTimeSigChange(bar));
             viewModel.AddKeyChangeCmd = ReactiveCommand.Create<int>(tick => AddKeyChange(tick));
             viewModel.DelKeyChangeCmd = ReactiveCommand.Create<int>(tick => DelKeyChange(tick));
+            viewModel.BarsEditCmd = ReactiveCommand.Create<int>(tick => BarsEditCommand(tick));
 
             timer = new DispatcherTimer(
                 TimeSpan.FromMilliseconds(15),
@@ -165,9 +166,18 @@ namespace OpenUtau.App.Views {
             DocManager.Inst.ExecuteCmd(new DelKeyChangeCommand(project, tick));
             DocManager.Inst.EndUndoGroup();
         }
+        private void BarsEditCommand(int tick) {
+            var project = DocManager.Inst.Project;
+            var vm = new EditBarsViewModel(project, -1, tick);
+            vm.Title = ThemeManager.GetString("editbar.editbar");
+            vm.handleRange = 1;
+            vm.handleRangeEnable = false;
+            var dialog = new EditBarsDialog() {
+                DataContext = vm,
+            };
+            dialog.ShowDialog(this);
+        }
 
-        
-        
         void OnMenuRemapTimeaxis(object sender, RoutedEventArgs e){
             var project = DocManager.Inst.Project;
             var dialog = new TypeInDialog {

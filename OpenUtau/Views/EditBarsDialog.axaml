@@ -24,7 +24,9 @@
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left">
             <Label Content="{StaticResource editbar.editrange}" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <ComboBox SelectedIndex="{Binding handleRange}" Width="120" Height="25" VerticalAlignment="Center">
+            <ComboBox SelectedIndex="{Binding handleRange}" Width="120" Height="25" 
+                      VerticalAlignment="Center" 
+                      IsEnabled="{Binding handleRangeEnable}">
                 <ComboBoxItem Content="{StaticResource editbar.curtrack}"/>
                 <ComboBoxItem Content="{StaticResource editbar.alltrack}"/>
             </ComboBox>

@@ -67,6 +67,25 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => $"Del tempo change {bpm} at {tick}";
     }
+    public class MoveTempoChangeCommand : ProjectCommand {
+        protected int tick;
+        protected int index;
+        public MoveTempoChangeCommand(UProject project, int index, int tick) : base(project) {
+            this.tick = tick;
+            this.index = index;
+        }
+        public override void Execute() {
+            if (index >= 0 && index < project.tempos.Count) {
+                project.tempos[index].position = project.tempos[index].position + tick;
+            }
+        }
+        public override void Unexecute() {
+            if (index >= 0 && index < project.tempos.Count) {
+                project.tempos[index].position = project.tempos[index].position + tick;
+            }
+        }
+        public override string ToString() => $"Move tempo change {tick} at {index}";
+    }
     public class AddKeyChangeCommand : ProjectCommand {
         protected int tick;
         protected int key;
@@ -112,6 +131,26 @@ namespace OpenUtau.Core {
             base.Execute();
         }
         public override string ToString() => $"Del tempo change {key} at {tick}";
+    }
+
+    public class MoveKeyChangeCommand : ProjectCommand {
+        protected int tick;
+        protected int index;
+        public MoveKeyChangeCommand(UProject project, int index, int tick) : base(project) {
+            this.tick = tick;
+            this.index = index;
+        }
+        public override void Execute() {
+            if (index >= 0 && index < project.keys.Count) {
+                project.keys[index].position = project.keys[index].position + tick;
+            }
+        }
+        public override void Unexecute() {
+            if (index >= 0 && index < project.keys.Count) {
+                project.keys[index].position = project.keys[index].position - tick;
+            }
+        }
+        public override string ToString() => $"Move Key change {tick} at {index}";
     }
 
     public class AddTimeSigCommand : ProjectCommand {
@@ -162,6 +201,25 @@ namespace OpenUtau.Core {
             base.Execute();
         }
         public override string ToString() => $"Del time sig change {beatPerBar}/{beatUnit} at bar {bar}";
+    }
+    public class MoveTimeSigCommand : ProjectCommand {
+        protected int index;
+        protected int moveLen;
+        public MoveTimeSigCommand(UProject project, int index, int moveLen) : base(project) {
+            this.index = index;
+            this.moveLen = moveLen;
+        }
+        public override void Execute() {
+            if (index >= 0 && index < project.timeSignatures.Count) {
+                project.timeSignatures[index].barPosition = project.timeSignatures[index].barPosition + moveLen;
+            }
+        }
+        public override void Unexecute() {
+            if (index >= 0 && index < project.timeSignatures.Count) {
+                project.timeSignatures[index].barPosition = project.timeSignatures[index].barPosition - moveLen;
+            }
+        }
+        public override string ToString() => $"Move time sig change";
     }
 
     public class TimeSignatureCommand : ProjectCommand {

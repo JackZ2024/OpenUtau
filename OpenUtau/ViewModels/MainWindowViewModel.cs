@@ -50,6 +50,7 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<int, Unit>? DelTimeSigChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? AddKeyChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? DelKeyChangeCmd { get; set; }
+        public ReactiveCommand<int, Unit>? BarsEditCmd { get; set; }
 
         private ObservableCollectionExtended<MenuItemViewModel> openRecent
             = new ObservableCollectionExtended<MenuItemViewModel>();
@@ -304,6 +305,13 @@ namespace OpenUtau.App.ViewModels {
                     Header = ThemeManager.GetString("context.timeline.addkey"),
                     Command = AddKeyChangeCmd,
                     CommandParameter = left,
+                });
+            }
+            if (project.parts.Count > 0) {
+                TimelineContextMenuItems.Add(new MenuItemViewModel {
+                    Header = ThemeManager.GetString("editbar.editbar"),
+                    Command = BarsEditCmd,
+                    CommandParameter = tick,
                 });
             }
         }
