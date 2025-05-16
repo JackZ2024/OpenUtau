@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using OpenUtau.App.ViewModels;
 
 namespace OpenUtau.App.Views {
@@ -11,7 +12,10 @@ namespace OpenUtau.App.Views {
         }
 
         void OnOpened(object? sender, EventArgs e) {
-            DIALOG_Box.Focus();
+            Dispatcher.UIThread.Post(() =>
+            {
+                DIALOG_Box.Focus();
+            }, DispatcherPriority.Background);
         }
 
         void OnReset(object? sender, RoutedEventArgs e) {
@@ -30,6 +34,12 @@ namespace OpenUtau.App.Views {
 
         private void OnKeyDown(object? sender, KeyEventArgs e) {
             switch (e.Key) {
+                case Key.S: 
+                    if(e.KeyModifiers == KeyModifiers.Control || e.KeyModifiers == KeyModifiers.Meta) {
+                        OnFinish(sender, e);
+                        e.Handled = true;
+                    }
+                    break;
                 case Key.Enter:
                     OnFinish(sender, e);
                     e.Handled = true;

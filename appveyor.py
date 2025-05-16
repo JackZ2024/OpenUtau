@@ -66,6 +66,8 @@ elif sys.platform == 'darwin':
     appcast_rid = "osx-x64"
     if platform.machine() == 'arm64':
         appcast_rid = "osx-arm64"
+    if len(sys.argv) > 2:
+        appcast_rid = sys.argv[2]
 
     # os.system("git checkout OpenUtau/OpenUtau.csproj")
     # os.system("rm LICENSE.txt")
