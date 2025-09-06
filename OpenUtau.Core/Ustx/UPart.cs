@@ -29,7 +29,7 @@ namespace OpenUtau.Core.Ustx {
         public UPart() { }
 
         public abstract int GetMinDurTick(UProject project);
-        public abstract int GetMaxPosTick(UProject project);
+        public abstract int GetMaxPosiTick(UProject project);
 
         public virtual void BeforeSave(UProject project, UTrack track) { }
         public virtual void AfterLoad(UProject project, UTrack track) { }
@@ -69,14 +69,11 @@ namespace OpenUtau.Core.Ustx {
             project.timeAxis.TickPosToBarBeat(endTicks, out int bar, out int beat, out int remainingTicks);
             return project.timeAxis.BarBeatToTickPos(bar, beat + 1) - position;
         }
-        public override int GetMaxPosTick(UProject project) {
-            if (notes.Count == 0) {
-                project.timeAxis.TickPosToBarBeat(End, out int bar, out int beat, out int remainingTicks);
-                return project.timeAxis.BarBeatToTickPos(bar, beat - 1);
-            } else {
-                int startTicks = position + (notes.FirstOrDefault()?.position ?? 1);
-                return startTicks;
-            }
+        
+        public override int GetMaxPosiTick(UProject project) {
+            int maxStartTick = position + (notes.FirstOrDefault()?.position ?? Duration);
+            project.timeAxis.TickPosToBarBeat(maxStartTick, out int bar, out int beat, out int remainingTicks);
+            return project.timeAxis.BarBeatToTickPos(bar, beat - 1);
         }
 
         public override void BeforeSave(UProject project, UTrack track) {
@@ -342,14 +339,14 @@ namespace OpenUtau.Core.Ustx {
         private int duration;
 
         public override int GetMinDurTick(UProject project) {
-
-            int endTicks = position;
-            project.timeAxis.TickPosToBarBeat(endTicks, out int bar, out int beat, out int remainingTicks);
-            return project.timeAxis.BarBeatToTickPos(bar, beat + 1) - position;
+            double posMs = project.timeAxis.TickPosToMsPos(position);
+            int end = project.timeAxis.MsPosToTickPos(posMs + fileDurationMs);
+            return end - position;
         }
-        public override int GetMaxPosTick(UProject project) {
-            project.timeAxis.TickPosToBarBeat(End, out int bar, out int beat, out int remainingTicks);
-            return project.timeAxis.BarBeatToTickPos(bar, beat - 1);
+
+        public override int GetMaxPosiTick(UProject project) {
+            // TODO
+            return position;
         }
 
         public override UPart Clone() {

@@ -44,9 +44,9 @@ namespace OpenUtau.App.ViewModels {
             foreach (var cur_part in handleParts) {
 
                 if (cur_part.position <= startPos) {
-                    // 如果要插入空白的位置在part中间，就需要细节处理，移动音符、标签、曲线等
+                    // 如果要删除空白的位置在part中间，就需要细节处理，移动音符、标签、曲线等
                     if(cur_part.duration <= handleLen) continue;
-                    DocManager.Inst.ExecuteCmd(new ResizePartCommand(this.project, cur_part, cur_part.duration - handleLen));
+                    DocManager.Inst.ExecuteCmd(new ResizePartCommand(this.project, cur_part, -handleLen, false));
 
                     // 如果note在删除的小节范围内，那就把note也删除
                     List<UNote> deleteNotes = new List<UNote>();
@@ -170,7 +170,7 @@ namespace OpenUtau.App.ViewModels {
                 
                 if (cur_part.position <= startPos) {
                     // 如果要插入空白的位置在part中间，就需要细节处理，移动音符、标签、曲线等
-                    DocManager.Inst.ExecuteCmd(new ResizePartCommand(this.project, cur_part, cur_part.duration + handleLen));
+                    DocManager.Inst.ExecuteCmd(new ResizePartCommand(this.project, cur_part, handleLen, false));
                     // 移动音符
                     List<UNote> moveNotes = new List<UNote>();
                     foreach (var note in cur_part.notes) {

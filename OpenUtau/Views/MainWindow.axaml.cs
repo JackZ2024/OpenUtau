@@ -93,6 +93,7 @@ namespace OpenUtau.App.Views {
                 () => (Application.Current?.ApplicationLifetime as IControlledApplicationLifetime)?.Shutdown(),
                 TaskScheduler.FromCurrentSynchronizationContext());
             Log.Information("Created main window.");
+            this.Cursor = null;
         }
 
         public void InitProject() {
@@ -178,7 +179,7 @@ namespace OpenUtau.App.Views {
             dialog.ShowDialog(this);
         }
 
-        void OnMenuRemapTimeaxis(object sender, RoutedEventArgs e){
+        void OnMenuRemapTimeaxis(object sender, RoutedEventArgs e) {
             var project = DocManager.Inst.Project;
             var dialog = new TypeInDialog {
                 Title = ThemeManager.GetString("menu.project.remaptimeaxis")
@@ -234,6 +235,7 @@ namespace OpenUtau.App.Views {
                 return;
             }
             viewModel.NewProject();
+            viewModel.Page = 1;
         }
 
         void OnMenuOpen(object sender, RoutedEventArgs args) => Open();
@@ -255,6 +257,7 @@ namespace OpenUtau.App.Views {
             }
             try {
                 viewModel.OpenProject(files);
+                viewModel.Page = 1;
             } catch (Exception e) {
                 Log.Error(e, $"Failed to open files {string.Join("\n", files)}");
                 _ = await MessageBox.ShowError(this, new MessageCustomizableException($"Failed to open files {string.Join("\n", files)}", $"<translate:errors.failed.openfile>:\n{string.Join("\n", files)}", e));
@@ -353,30 +356,20 @@ namespace OpenUtau.App.Views {
                 if (loadedProjects == null || loadedProjects.Length == 0) {
                     return;
                 }
-                bool importTempo = true;
-                switch (Preferences.Default.ImportTempo) {
-                    case 1:
-                        importTempo = false;
-                        break;
-                    case 2:
-                        if (loadedProjects[0].tempos.Count == 0) {
-                            importTempo = false;
-                            break;
-                        }
-                        var tempoString = String.Join("\n",
-                            loadedProjects[0].tempos
-                                .Select(tempo => $"position: {tempo.position}, tempo: {tempo.bpm}")
-                            );
-                        //ask the user
-                        var result = await MessageBox.Show(
-                            this,
-                            ThemeManager.GetString("dialogs.importtracks.importtempo") + "\n" + tempoString,
-                            ThemeManager.GetString("dialogs.importtracks.caption"),
-                            MessageBox.MessageBoxButtons.YesNo);
-                        if (result == MessageBox.MessageBoxResult.No) {
-                            importTempo = false;
-                        }
-                        break;
+                // Imports tempo for new projects, otherwise asks the user.
+                bool importTempo = DocManager.Inst.Project.parts.Count == 0;
+                if (!importTempo && loadedProjects[0].tempos.Count > 0) {
+                    var tempoString = string.Join("\n",
+                        loadedProjects[0].tempos
+                            .Select(tempo => $"position: {tempo.position}, tempo: {tempo.bpm}")
+                        );
+                    // Ask the user
+                    var result = await MessageBox.Show(
+                        this,
+                        ThemeManager.GetString("dialogs.importtracks.importtempo") + "\n" + tempoString,
+                        ThemeManager.GetString("dialogs.importtracks.caption"),
+                        MessageBox.MessageBoxButtons.YesNo);
+                    importTempo = result == MessageBox.MessageBoxResult.Yes;
                 }
                 viewModel.ImportTracks(loadedProjects, importTempo);
             } catch (Exception e) {
@@ -637,13 +630,7 @@ namespace OpenUtau.App.Views {
                 }
             } catch (Exception e) {
                 Log.Error(e, $"Failed to install singer {file}");
-                MessageCustomizableException mce;
-                if (e is MessageCustomizableException) {
-                    mce = (MessageCustomizableException)e;
-                } else {
-                    mce = new MessageCustomizableException($"Failed to install singer {file}", $"<translate:errors.failed.installsinger>: {file}", e);
-                }
-                _ = await MessageBox.ShowError(this, mce);
+                _ = await MessageBox.ShowError(this, new MessageCustomizableException($"Failed to install singer {file}", $"<translate:errors.failed.installsinger>: {file}", e));
             }
         }
 
@@ -656,6 +643,24 @@ namespace OpenUtau.App.Views {
             if (file.EndsWith(DependencyInstaller.FileExt)) {
                 DependencyInstaller.Install(file);
                 return;
+            }
+        }
+
+        async void OnMenuInstallWavtoolResampler(object sender, RoutedEventArgs args) {
+            var file = await FilePicker.OpenFile(
+                this, "menu.tools.dependency.install", FilePicker.EXE);
+            if (file == null) {
+                return;
+            }
+
+            if (file.EndsWith(".exe")) {
+                var setup = new ExeSetupDialog() {
+                    DataContext = new ExeSetupViewModel(file)
+                };
+                _ = setup.ShowDialog(this);
+                if (setup.Position.Y < 0) {
+                    setup.Position = setup.Position.WithY(0);
+                }
             }
         }
 
@@ -907,6 +912,7 @@ namespace OpenUtau.App.Views {
                 }
                 try {
                     viewModel.OpenProject(new string[] { file });
+                    viewModel.Page = 1;
                 } catch (Exception e) {
                     Log.Error(e, $"Failed to open file {file}");
                     _ = await MessageBox.ShowError(this, new MessageCustomizableException($"Failed to open file {file}", $"<translate:errors.failed.openfile>: {file}", e));
@@ -914,6 +920,7 @@ namespace OpenUtau.App.Views {
             } else if (ext == ".mid" || ext == ".midi") {
                 try {
                     viewModel.ImportMidi(file);
+                    viewModel.Page = 1;
                 } catch (Exception e) {
                     Log.Error(e, "Failed to import midi");
                     _ = await MessageBox.ShowError(this, new MessageCustomizableException("Failed to import midi", "<translate:errors.failed.importmidi>", e));
@@ -931,13 +938,7 @@ namespace OpenUtau.App.Views {
                     }
                 } catch (Exception e) {
                     Log.Error(e, $"Failed to install singer {file}");
-                    MessageCustomizableException mce;
-                    if (e is MessageCustomizableException) {
-                        mce = (MessageCustomizableException)e;
-                    } else {
-                        mce = new MessageCustomizableException($"Failed to install singer {file}", $"<translate:errors.failed.installsinger>: {file}", e);
-                    }
-                    _ = await MessageBox.ShowError(this, mce);
+                    _ = await MessageBox.ShowError(this, new MessageCustomizableException($"Failed to install singer {file}", $"<translate:errors.failed.installsinger>: {file}", e));
                 }
             } else if (ext == Core.Vogen.VogenSingerInstaller.FileExt) {
                 Core.Vogen.VogenSingerInstaller.Install(file);
@@ -970,6 +971,7 @@ namespace OpenUtau.App.Views {
             } else if (ext == ".mp3" || ext == ".wav" || ext == ".ogg" || ext == ".flac") {
                 try {
                     viewModel.ImportAudio(file);
+                    viewModel.Page = 1;
                 } catch (Exception e) {
                     Log.Error(e, "Failed to import audio");
                     _ = await MessageBox.ShowError(this, new MessageCustomizableException("Failed to import audio", "<translate:errors.failed.importaudio>", e));
@@ -1033,6 +1035,7 @@ namespace OpenUtau.App.Views {
                 viewModel.TracksViewModel.PointToLineTick(point.Position, out int left, out int right);
                 viewModel.PlaybackViewModel.MovePlayPos(left);
             }
+            Cursor = null;
         }
 
         public void TimelinePointerReleased(object sender, PointerReleasedEventArgs args) {
@@ -1177,7 +1180,7 @@ namespace OpenUtau.App.Views {
             }
         }
 
-        public void PartsCanvasPointerWheelChanged(object sender, PointerWheelEventArgs args) {
+        public void MainPagePointerWheelChanged(object sender, PointerWheelEventArgs args) {
             var delta = args.Delta;
             if (args.KeyModifiers == KeyModifiers.None || args.KeyModifiers == KeyModifiers.Shift) {
                 if (args.KeyModifiers == KeyModifiers.Shift) {
@@ -1354,6 +1357,26 @@ namespace OpenUtau.App.Views {
             }
         }
 
+        public async void OnWelcomeRecent(object sender, PointerPressedEventArgs args) {
+            if (sender is StackPanel panel &&
+                panel.DataContext is RecentFileInfo fileInfo) {
+                if (!DocManager.Inst.ChangesSaved && !await AskIfSaveAndContinue()) {
+                    return;
+                }
+                viewModel.OpenRecent(fileInfo.PathName);
+            }
+        }
+
+        public async void OnWelcomeTemplate(object sender, PointerPressedEventArgs args) {
+            if (sender is StackPanel panel &&
+                panel.DataContext is RecentFileInfo fileInfo) {
+                if (!DocManager.Inst.ChangesSaved && !await AskIfSaveAndContinue()) {
+                    return;
+                }
+                viewModel.OpenTemplate(fileInfo.PathName);
+            }
+        }
+
         async void ValidateTracksVoiceColor() {
             DocManager.Inst.StartUndoGroup();
             foreach (var track in DocManager.Inst.Project.tracks) {
@@ -1416,7 +1439,7 @@ namespace OpenUtau.App.Views {
             }
         }
 
-        public async void WindowClosing(object? sender, WindowClosingEventArgs e) {
+        public void WindowClosing(object? sender, WindowClosingEventArgs e) {
             if (forceClose || DocManager.Inst.ChangesSaved) {
                 if (Preferences.Default.ClearCacheOnQuit) {
                     Log.Information("Clearing cache...");
@@ -1428,12 +1451,14 @@ namespace OpenUtau.App.Views {
                 return;
             }
             e.Cancel = true;
-            if (!await AskIfSaveAndContinue()) {
-                return;
-            }
-            pianoRollWindow?.Close();
-            forceClose = true;
-            Close();
+            AskIfSaveAndContinue().ContinueWith(t => {
+                if (!t.Result) {
+                    return;
+                }
+                pianoRollWindow?.Close();
+                forceClose = true;
+                Close();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private async Task<bool> AskIfSaveAndContinue() {
