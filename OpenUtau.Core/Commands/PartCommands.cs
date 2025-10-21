@@ -91,6 +91,7 @@ namespace OpenUtau.Core {
             }
         }
     }
+    // add by Jack
     public class SkipPartCommand : PartCommand {
         readonly int newDur, oldDur;
         readonly int newPos, oldPos;
@@ -183,7 +184,7 @@ namespace OpenUtau.Core {
             }
         }
     }
-
+    // end add
     public class RenamePartCommand : PartCommand {
         readonly string newName, oldName;
         public RenamePartCommand(UProject project, UPart part, string name) : base(project, part) {

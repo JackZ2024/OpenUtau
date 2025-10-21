@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
+using Avalonia.Threading; // add by Jack
 using OpenUtau.App.ViewModels;
 
 namespace OpenUtau.App.Views {
@@ -13,10 +13,12 @@ namespace OpenUtau.App.Views {
         }
 
         void OnOpened(object? sender, EventArgs e) {
+            // modify by Jack
             Dispatcher.UIThread.Post(() =>
             {
-                DIALOG_Box.Focus();
+            DIALOG_Box.Focus();
             }, DispatcherPriority.Background);
+            // end modify
         }
 
         void OnReset(object? sender, RoutedEventArgs e) {
@@ -35,12 +37,14 @@ namespace OpenUtau.App.Views {
 
         private void TextBoxKeyDown(object? sender, KeyEventArgs e) {
             switch (e.Key) {
+                // add by Jack
                 case Key.S: 
                     if(e.KeyModifiers == KeyModifiers.Control || e.KeyModifiers == KeyModifiers.Meta) {
                         OnFinish(sender, e);
                         e.Handled = true;
                     }
                     break;
+                    // end add
                 case Key.Enter:
                     //If Shift+Enter, insert line break (default textbox behavior).
                     if (e.KeyModifiers == KeyModifiers.Shift) {

@@ -20,7 +20,9 @@ namespace OpenUtau.Core.Ustx {
         public string comment = string.Empty;
         public int trackNo;
         public int position = 0;
+        // add by Jack
         public List<URemark> remarks = new List<URemark>();
+        // end add
 
         [YamlIgnore] public virtual string DisplayName { get; }
         [YamlIgnore] public virtual int Duration { set; get; }
@@ -47,7 +49,7 @@ namespace OpenUtau.Core.Ustx {
         [YamlMember(Order = 101)]
         public List<UCurve> curves = new List<UCurve>();
 
-        public List<UPhoneme> phonemes = new List<UPhoneme>();
+        public List<UPhoneme> phonemes = new List<UPhoneme>(); // modify by Jack
         [YamlIgnore] public int phonemesRevision = 0;
         [YamlIgnore] public List<RenderPhrase> renderPhrases = new List<RenderPhrase>();
 
@@ -59,7 +61,7 @@ namespace OpenUtau.Core.Ustx {
 
         [YamlIgnore] public bool PhonemesUpToDate => notesTimestamp == phonemesTimestamp;
         [YamlIgnore] public ISignalSource Mix => mix;
-        [YamlIgnore] public bool updatePhonemes = false;
+        [YamlIgnore] public bool updatePhonemes = false; // add by Jack
 
         public override string DisplayName => name;
         public override int Duration { get => duration; set => duration = value; }
@@ -151,9 +153,10 @@ namespace OpenUtau.Core.Ustx {
                 if (phonemizerResponse != null) {
                     var resp = phonemizerResponse;
                     if (resp.timestamp == notesTimestamp) {
-                        var oldPhonemes = phonemes.ToArray();
+                        var oldPhonemes = phonemes.ToArray(); // add by Jack
                         phonemes.Clear();
                         notes.ForEach(note => note.phonemizerExpressions.Clear());
+
                         for (int i = 0; i < resp.phonemes.Length; ++i) {
                             var indexes = new List<int>();
                             var note = notes.ElementAtOrDefault(resp.noteIndexes[i]);
@@ -191,7 +194,7 @@ namespace OpenUtau.Core.Ustx {
                             indexes.Sort();
                             note.phonemeIndexes = indexes.ToArray();
                         }
-
+                        // add by Jack
                         bool sameLength = (phonemes.Count == oldPhonemes.Length);
                         if (!updatePhonemes && Preferences.Default.KeepPhonemesLength) {
                             for (int i = 0; i < phonemes.Count; i++) {
@@ -207,11 +210,11 @@ namespace OpenUtau.Core.Ustx {
                                 }
                             }
                         }
-                        
+                        // end add
                         phonemesTimestamp = resp.timestamp;
                     }
                     phonemizerResponse = null;
-                    updatePhonemes = false;
+                    updatePhonemes = false; // add by Jack
                 }
             }
             if (!options.SkipPhoneme) {
@@ -298,7 +301,9 @@ namespace OpenUtau.Core.Ustx {
                 notes = new SortedSet<UNote>(notes.Select(note => note.Clone())),
                 curves = curves.Select(c => c.Clone()).ToList(),
                 Duration = Duration,
+                // add by Jack
                 remarks = new List<URemark>(remarks.Select(remark => remark.Clone())),
+                // end add
             };
         }
     }
@@ -317,16 +322,17 @@ namespace OpenUtau.Core.Ustx {
 
         [YamlMember(Order = 100)] public string relativePath;
         [YamlMember(Order = 101)] public double fileDurationMs;
+        // modify by Jack
         [YamlMember(Order = 102)] public int skipTicks = 0;
         [YamlMember(Order = 103)] public int trimTicks = 0;
-
+        // end modify
 
         [YamlIgnore]
         public override string DisplayName => Missing ? $"[Missing] {name}" : name;
         [YamlIgnore]
         public override int Duration {
             get => duration;
-            set { duration = value; }
+            set { }
         }
         [YamlIgnore] bool Missing { get; set; }
         [YamlIgnore] public float[] Samples { get; private set; }
@@ -353,8 +359,10 @@ namespace OpenUtau.Core.Ustx {
             var part = new UWavePart() {
                 _filePath = _filePath,
                 relativePath = relativePath,
+                // modify by Jack
                 skipTicks = skipTicks,
                 trimTicks = trimTicks,
+                // end modify
             };
             part.Load(DocManager.Inst.Project);
             return part;
@@ -428,7 +436,7 @@ namespace OpenUtau.Core.Ustx {
         private void UpdateDuration(UProject project) {
             double posMs = project.timeAxis.TickPosToMsPos(position);
             int end = project.timeAxis.MsPosToTickPos(posMs + fileDurationMs);
-            duration = end - position - skipTicks - trimTicks;
+            duration = end - position - skipTicks - trimTicks; // modify by Jack
         }
 
         public override void BeforeSave(UProject project, UTrack track) {

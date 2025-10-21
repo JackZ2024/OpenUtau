@@ -26,7 +26,6 @@ namespace OpenUtau.App.Views {
                     return false;
                 }
                 var info = await updater.CheckForUpdatesQuietly(true);
-                UpdaterViewModel.UpdateVersionInfo(ref info);
                 if (info.Status == UpdateStatus.UpdateAvailable) {
                     if (info.Updates[0].Version.ToString() == Preferences.Default.SkipUpdate) {
                         return false;

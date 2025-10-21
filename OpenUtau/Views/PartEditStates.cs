@@ -187,6 +187,7 @@ namespace OpenUtau.App.Views {
             }
         }
     }
+    // add by Jack
     class PartSkipEditState : PartEditState {
         public readonly UPart part;
         public PartSkipEditState(Control control, MainWindowViewModel vm, UPart part) : base(control, vm) {
@@ -259,7 +260,7 @@ namespace OpenUtau.App.Views {
             DocManager.Inst.ExecuteCmd(new SkipWavPartCommand(project, part, left, offsetX));
         }
     }
-
+    // end add
     class PartEraseEditState : PartEditState {
         public override MouseButton MouseButton => MouseButton.Right;
         public PartEraseEditState(Control control, MainWindowViewModel vm) : base(control, vm) { }

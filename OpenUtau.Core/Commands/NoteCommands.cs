@@ -136,6 +136,7 @@ namespace OpenUtau.Core {
             }
         }
     }
+    // add by Jack
     public class MergeNotesCommand : NoteCommand {
         readonly string OldLyrics;
         readonly int deleteNoteIndex;
@@ -170,6 +171,7 @@ namespace OpenUtau.Core {
             }
         }
     }
+    // end add
     public class ChangeNoteLyricCommand : NoteCommand {
         readonly string[] NewLyrics;
         readonly string[] OldLyrics;

@@ -13,7 +13,9 @@ namespace OpenUtau.App.Controls {
         private TextBox box;
         private ListBox listBox;
         private DispatcherTimer? focusTimer;
+        // add by Jack
         private bool isEsc = false;
+        // end add
 
         public LyricBox() {
             InitializeComponent();
@@ -98,7 +100,7 @@ namespace OpenUtau.App.Controls {
                     e.Handled = true;
                     break;
                 case Key.Escape:
-                    isEsc = true;
+                    isEsc = true;// add by Jack
                     EndEdit();
                     e.Handled = true;
                     break;
@@ -176,17 +178,19 @@ namespace OpenUtau.App.Controls {
         }
 
         public void EndEdit(bool commit = false) {
+            // modify by Jack
             if (viewModel.Text != "" && !isEsc) {
                 viewModel.Commit();
             }
             else if (commit) {
                 viewModel.Commit();
             }
+            // end modify
             viewModel.Part = null;
             viewModel.NoteOrPhoneme = null;
             viewModel.IsVisible = false;
             viewModel.Text = string.Empty;
-            isEsc = false;
+            isEsc = false; // add by Jack
             TopLevel.GetTopLevel(this)?.FocusManager?.ClearFocus();
         }
     }

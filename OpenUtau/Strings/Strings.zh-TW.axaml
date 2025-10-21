@@ -180,9 +180,11 @@
   <system:String x:Key="menu.edit.redo">重做</system:String>
   <system:String x:Key="menu.edit.selectall">全選</system:String>
   <system:String x:Key="menu.edit.undo">復原</system:String>
+  <!-- add by Jack  -->
   <system:String x:Key="menu.edit.copypoints">複製曲綫點</system:String>
   <system:String x:Key="menu.edit.pastepoints">粘貼曲綫點</system:String>
   <system:String x:Key="menu.edit.deletepoints">刪除曲綫點</system:String>
+  <!-- end add   -->
   <system:String x:Key="menu.file">檔案</system:String>
   <system:String x:Key="menu.file.exit">結束</system:String>
   <system:String x:Key="menu.file.exportaudio">匯出音訊</system:String>
@@ -372,8 +374,10 @@ Syntax: prefix,suffix</system:String>-->
   <system:String x:Key="pianoroll.toggle.tone">啟用音調提示 (Y)</system:String>
   <system:String x:Key="pianoroll.toggle.vibrato">顯示顫音 (U)</system:String>
   <system:String x:Key="pianoroll.toggle.waveform">顯示波形 (W)</system:String>
+  <!-- add by Jack  -->
   <system:String x:Key="pianoroll.toggle.Metronome">節拍器</system:String>
   <system:String x:Key="pianoroll.toggle.EditCurve">編輯曲綫點 (Ctrl+E)</system:String>
+  <!-- end add   -->
   <!--<system:String x:Key="pianoroll.tool.drawlinepitch">Line Draw Pitch Tool (Shift + 4)
     Left click to draw (draw straight line)
     Right click to reset

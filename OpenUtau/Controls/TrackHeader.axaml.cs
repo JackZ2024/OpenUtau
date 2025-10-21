@@ -71,7 +71,7 @@ namespace OpenUtau.App.Controls {
             unbinds.Add(this.Bind(OffsetProperty, canvas.WhenAnyValue(x => x.TrackOffset, trackOffset => new Point(0, -trackOffset * TrackHeight))));
             SetPosition();
         }
-
+        // add by Jack
         public void showDragLine(bool up) {
             if (ViewModel != null) {
                 if (up) {
@@ -89,7 +89,7 @@ namespace OpenUtau.App.Controls {
                 ViewModel.showBottomLine = false;
             }
         }
-
+        // end add
         private void SetPosition() {
             Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, Offset.Y + (track?.TrackNo ?? 0) * trackHeight);
@@ -101,11 +101,11 @@ namespace OpenUtau.App.Controls {
         }
 
         void SingerButtonClicked(object sender, RoutedEventArgs args) {
-            if (SingerManager.Inst.Singers.Count > 0) {
+            try {
                 ViewModel?.RefreshSingers();
                 SingersMenu.Open();
-            } else {
-                DocManager.Inst.ExecuteCmd(new ErrorMessageNotification("There is no singer."));
+            } catch (Exception e) {
+                DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(e));
             }
             args.Handled = true;
         }

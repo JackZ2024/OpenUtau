@@ -96,8 +96,10 @@ namespace OpenUtau.App.Controls {
                             int endSample = Math.Clamp((int)((endMs - leftMs) * 44100 / 1000) * 2, 0, sampleCount);
                             if (endSample > startSample) {
                                 var segment = new ArraySegment<float>(sampleData, startSample, endSample - startSample);
+                                // modify by Jack
                                 float min = 0.5f + segment.Min() * 0.7f;
                                 float max = 0.5f + segment.Max() * 0.7f;
+                                // end modify
                                 float yMax = Math.Clamp(max * bitmap.PixelSize.Height, 0, bitmap.PixelSize.Height - 1);
                                 float yMin = Math.Clamp(min * bitmap.PixelSize.Height, 0, bitmap.PixelSize.Height - 1);
                                 DrawPeak(bitmapData, bitmap.PixelSize.Width, i, (int)Math.Round(yMin), (int)Math.Round(yMax));
@@ -123,7 +125,9 @@ namespace OpenUtau.App.Controls {
             if (desiredWidth == 0 || desiredHeight == 0) {
                 return null;
             }
+            // modify by Jack
             if (bitmap == null || bitmap.Size.Width < desiredWidth || bitmap.Size.Height != desiredHeight) {
+            // end modify
                 bitmap?.Dispose();
                 var size = new PixelSize(desiredWidth, desiredHeight);
                 bitmap = new WriteableBitmap(

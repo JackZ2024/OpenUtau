@@ -178,9 +178,11 @@ namespace OpenUtau.Core.Analysis.Some {
             public bool[] note_rest;
             //duration of each note in seconds
             public float[] note_dur;
-        }
+        }    
+        // add by Jack    
         [DllImport("PraatDll.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GenPitch(IntPtr wav_data, int length, int channel, int hop_size, int audio_sample_rate, ref int retLength, ref double timeStep);
+        // end add
         public Some() {
             Location = Path.Combine(PathManager.Inst.DependencyPath, "some");
             string yamlpath = Path.Combine(Location, "some.yaml");
@@ -267,7 +269,7 @@ namespace OpenUtau.Core.Analysis.Some {
                         var durTick = timeAxis.MsPosToTickPos(currMs + noteDurMs) - posTick;
                         var note = project.CreateNote(
                             (int)Math.Round(note_midi[index]),
-                            posTick - wavePart.position - wavePart.skipTicks,
+                            posTick - wavePart.position - wavePart.skipTicks, // change by Jack
                             durTick
                         );
                         part.notes.Add(note);
@@ -279,6 +281,7 @@ namespace OpenUtau.Core.Analysis.Some {
             if(endTick > part.End){
                 part.Duration = endTick - part.position;
             }
+            // add by Jack
             if(OS.IsWindows()) {
                 IntPtr pdata = Marshal.AllocHGlobal(wavePart.Samples.Length * sizeof(float));
                 Marshal.Copy(wavePart.Samples, 0, pdata, wavePart.Samples.Length);
@@ -336,7 +339,7 @@ namespace OpenUtau.Core.Analysis.Some {
                     }
                 }
             }
-
+            // end add
             return part;
         }
 

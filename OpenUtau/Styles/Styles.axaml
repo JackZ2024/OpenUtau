@@ -45,13 +45,12 @@
     <Setter Property="Height" Value="1" />
   </Style>
 
-    <Style Selector="MenuItem.MenuItemWithSubMenu MenuItem">
-      <Setter Property="Header" Value="{Binding Header}"/>
-      <Setter Property="Command" Value="{Binding Command}"/>
-      <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
-      <Setter Property="InputGesture" Value="{Binding InputGesture}"/>
-      <Setter Property="Height" Value="{Binding Height}"/>
-    </Style>
+  <Style Selector="MenuItem.MenuItemWithSubMenu MenuItem">
+    <Setter Property="Header" Value="{Binding Header}"/>
+    <Setter Property="Command" Value="{Binding Command}"/>
+    <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
+    <Setter Property="Height" Value="{Binding Height}"/>
+  </Style>
 
   <Style Selector="ContextMenu MenuItem">
     <Setter Property="Background" Value="Transparent"/>

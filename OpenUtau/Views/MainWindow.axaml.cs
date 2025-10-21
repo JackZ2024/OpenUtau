@@ -23,6 +23,7 @@ using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
 using ReactiveUI;
 using Serilog;
+using SharpCompress;
 using Point = Avalonia.Point;
 
 namespace OpenUtau.App.Views {
@@ -38,33 +39,37 @@ namespace OpenUtau.App.Views {
         private readonly DispatcherTimer timer;
         private readonly DispatcherTimer autosaveTimer;
         private bool forceClose;
-        private int lastKey = 0;
 
         private bool shouldOpenPartsContextMenu;
+        // add by Jack
+        private int lastKey = 0;
         private bool headerLeftBtnDown = false;
         private bool headerStartDrop = false;
-
         private Point valueTipPointerPosition;
+        // end add
 
         private readonly ReactiveCommand<UPart, Unit> PartRenameCommand;
         private readonly ReactiveCommand<UPart, Unit> PartGotoFileCommand;
         private readonly ReactiveCommand<UPart, Unit> PartReplaceAudioCommand;
         private readonly ReactiveCommand<UPart, Unit> PartTranscribeCommand;
+        private readonly ReactiveCommand<UPart, Unit> PartMergeCommand;
 
         public MainWindow() {
             Log.Information("Creating main window.");
             InitializeComponent();
             Log.Information("Initialized main window component.");
             DataContext = viewModel = new MainWindowViewModel();
-            ValueTip.IsVisible = false;
+            ValueTip.IsVisible = false; // add by Jack
             viewModel.NewProject();
             viewModel.AddTempoChangeCmd = ReactiveCommand.Create<int>(tick => AddTempoChange(tick));
             viewModel.DelTempoChangeCmd = ReactiveCommand.Create<int>(tick => DelTempoChange(tick));
             viewModel.AddTimeSigChangeCmd = ReactiveCommand.Create<int>(bar => AddTimeSigChange(bar));
             viewModel.DelTimeSigChangeCmd = ReactiveCommand.Create<int>(bar => DelTimeSigChange(bar));
+            // add by Jack
             viewModel.AddKeyChangeCmd = ReactiveCommand.Create<int>(tick => AddKeyChange(tick));
             viewModel.DelKeyChangeCmd = ReactiveCommand.Create<int>(tick => DelKeyChange(tick));
             viewModel.BarsEditCmd = ReactiveCommand.Create<int>(tick => BarsEditCommand(tick));
+            // end add
 
             timer = new DispatcherTimer(
                 TimeSpan.FromMilliseconds(15),
@@ -82,6 +87,7 @@ namespace OpenUtau.App.Views {
             PartGotoFileCommand = ReactiveCommand.Create<UPart>(part => GotoFile(part));
             PartReplaceAudioCommand = ReactiveCommand.Create<UPart>(part => ReplaceAudio(part));
             PartTranscribeCommand = ReactiveCommand.Create<UPart>(part => Transcribe(part));
+            PartMergeCommand = ReactiveCommand.Create<UPart>(part => MergePart(part));
 
             AddHandler(DragDrop.DropEvent, OnDrop);
 
@@ -150,6 +156,7 @@ namespace OpenUtau.App.Views {
             DocManager.Inst.ExecuteCmd(new DelTempoChangeCommand(project, tick));
             DocManager.Inst.EndUndoGroup();
         }
+        // add by Jack
         private void AddKeyChange(int tick) {
             var project = DocManager.Inst.Project;
             var dialog = new KeySignatureDialog(lastKey);
@@ -178,6 +185,7 @@ namespace OpenUtau.App.Views {
             };
             dialog.ShowDialog(this);
         }
+        // end add
 
         void OnMenuRemapTimeaxis(object sender, RoutedEventArgs e) {
             var project = DocManager.Inst.Project;
@@ -780,6 +788,7 @@ namespace OpenUtau.App.Views {
                 pianoRollWindow.Height = (y != null ? wa.Size.Height - (Height + titleBarHeight) : wa.Size.Height) - titleBarHeight;
             }
         }
+        // add by Jack
         void ShowValueTip() {
             if (ValueTip != null) {
                 ValueTip.IsVisible = true;
@@ -811,6 +820,7 @@ namespace OpenUtau.App.Views {
             }
             Canvas.SetTop(ValueTip, tipY);
         }
+        // end add
 
         void OnKeyDown(object sender, KeyEventArgs args) {
             var tracksVm = viewModel.TracksViewModel;
@@ -1066,18 +1076,22 @@ namespace OpenUtau.App.Views {
                     bool isWave = partControl.part is UWavePart;
                     bool trim = point.Position.X > partControl.Bounds.Right - ViewConstants.ResizeMargin;
                     bool skip = point.Position.X < partControl.Bounds.Left + ViewConstants.ResizeMargin;
-                    if (isVoice && trim ) {
+                    if (isVoice && trim) {
                         partEditState = new PartResizeEditState(control, viewModel, partControl.part);
                         Cursor = ViewConstants.cursorSizeWE;
                     } else if (isVoice && skip) {
-                        partEditState = new PartSkipEditState(control, viewModel, partControl.part);
+                        partEditState = new PartSkipEditState(control, viewModel, partControl.part); // change by Jack
                         Cursor = ViewConstants.cursorSizeWE;
                     } else if (isWave && skip) {
+                        // change by Jack
                         partEditState = new WavPartSkipEditState(control, viewModel, partControl.part);
                         Cursor = ViewConstants.cursorSizeWE;
+                        // end change
                     } else if (isWave && trim) {
+                        // change by Jack
                         partEditState = new WavPartResizeEditState(control, viewModel, partControl.part);
                         Cursor = ViewConstants.cursorSizeWE;
+                        // end change
                     } else {
                         partEditState = new PartMoveEditState(control, viewModel, partControl.part);
                         Cursor = ViewConstants.cursorSizeAll;
@@ -1097,6 +1111,7 @@ namespace OpenUtau.App.Views {
                             PartReplaceAudioCommand = PartReplaceAudioCommand,
                             PartRenameCommand = PartRenameCommand,
                             PartTranscribeCommand = PartTranscribeCommand,
+                            PartMergeCommand = PartMergeCommand,
                         };
                         shouldOpenPartsContextMenu = true;
                     }
@@ -1126,11 +1141,11 @@ namespace OpenUtau.App.Views {
                 bool isWave = partControl.part is UWavePart;
                 bool trim = point.Position.X > partControl.Bounds.Right - ViewConstants.ResizeMargin;
                 bool skip = point.Position.X < partControl.Bounds.Left + ViewConstants.ResizeMargin;
-                if (isVoice && (trim || skip)) {
+                if (isVoice && (skip || trim)) {
                     Cursor = ViewConstants.cursorSizeWE;
                 } else if (isWave && (skip || trim)) {
                     //Cursor = null; // TODO
-                    Cursor = ViewConstants.cursorSizeWE;
+                    Cursor = ViewConstants.cursorSizeWE; // add by Jack
                 } else {
                     Cursor = null;
                 }
@@ -1204,6 +1219,7 @@ namespace OpenUtau.App.Views {
                 partEditState.Update(point.Pointer, point.Position);
             }
         }
+        // add by Jack
         public void TrackHeaderCanvasPointerPressed(object sender, PointerPressedEventArgs args) {
             var control = (Control)sender;
             var point = args.GetCurrentPoint(control);
@@ -1254,6 +1270,7 @@ namespace OpenUtau.App.Views {
                 }
             }
         }
+        // end add
 
         public void PartsContextMenuOpening(object sender, CancelEventArgs args) {
             if (shouldOpenPartsContextMenu) {
@@ -1355,6 +1372,73 @@ namespace OpenUtau.App.Views {
                     MessageBox.ShowError(this, e);
                 }
             }
+        }
+
+        void MergePart(UPart part) {
+            List<UPart> selectedParts = viewModel.TracksViewModel.SelectedParts;
+            if (!selectedParts.All(p => p.trackNo.Equals(part.trackNo))) {
+                _ = MessageBox.Show(
+                    this,
+                    ThemeManager.GetString("dialogs.merge.multitracks"),
+                    ThemeManager.GetString("dialogs.merge.caption"),
+                    MessageBox.MessageBoxButtons.Ok);
+                return;
+            }
+            if (selectedParts.Count() <= 1) { return; }
+            List<UVoicePart> voiceParts = [];
+            foreach (UPart p in selectedParts) {
+                if (p is UVoicePart vp) {
+                    voiceParts.Add(vp);
+                } else {
+                    return;
+                }
+            }
+            UVoicePart mergedPart = voiceParts.Aggregate((merging, nextup) => {
+                string newComment = merging.comment + nextup.comment; // Not sure how comments are used
+                var (leftPart, rightPart) = (merging.position < nextup.position) ? (merging, nextup) : (nextup, merging);
+                int newPosition = leftPart.position;
+                int newDuration = Math.Max(leftPart.End, rightPart.End) - newPosition;
+                int deltaPos = rightPart.position - leftPart.position;
+                UVoicePart shiftPart = new UVoicePart();
+                rightPart.notes.ForEach((note) => {
+                    UNote shiftNote = note.Clone();
+                    shiftNote.position += deltaPos;
+                    shiftPart.notes.Add(shiftNote);
+                });
+                foreach (var curve in rightPart.curves) {
+                    UCurve shiftCurve = curve.Clone();
+                    for (var i = 0; i < shiftCurve.xs.Count; i++) {
+                        shiftCurve.xs[i] += deltaPos;
+                    }
+                    shiftPart.curves.Add(shiftCurve);
+                }
+                SortedSet<UNote> newNotes = [.. leftPart.notes, .. shiftPart.notes];
+                List<UCurve> newCurves = UCurve.MergeCurves(leftPart.curves, shiftPart.curves);
+                return new UVoicePart() {
+                    name = part.name,
+                    comment = newComment,
+                    trackNo = part.trackNo,
+                    position = newPosition,
+                    notes = newNotes,
+                    curves = newCurves,
+                    Duration = newDuration,
+                };
+            });
+            ValidateOptions options = new ValidateOptions() {
+                SkipTiming = true,
+                Part = mergedPart,
+                SkipPhoneme = false,
+                SkipPhonemizer = false
+            };
+            mergedPart.Validate(options, DocManager.Inst.Project, DocManager.Inst.Project.tracks[part.trackNo]);
+            DocManager.Inst.StartUndoGroup();
+            for (int i = selectedParts.Count - 1; i >= 0; i--) {
+                // The index will shift by removing a part on each loop
+                // Workaround by removing backwards from the largest index and going down
+                DocManager.Inst.ExecuteCmd(new RemovePartCommand(DocManager.Inst.Project, selectedParts[i]));
+            }
+            DocManager.Inst.ExecuteCmd(new AddPartCommand(DocManager.Inst.Project, mergedPart));
+            DocManager.Inst.EndUndoGroup();
         }
 
         public async void OnWelcomeRecent(object sender, PointerPressedEventArgs args) {
@@ -1504,10 +1588,11 @@ namespace OpenUtau.App.Views {
                     ValidateTracksVoiceColor();
                 } else {
                     UTrack track = DocManager.Inst.Project.tracks[voicecolorNotif.TrackNo];
-                    if (!voicecolorNotif.Validate) {
-                        VoiceColorRemapping(track, track.VoiceColorNames, track.VoiceColorExp.options);
-                    } else if (track.ValidateVoiceColor(out var oldColors, out var newColors)) {
+                    if (track.ValidateVoiceColor(out var oldColors, out var newColors)) {
                         VoiceColorRemapping(track, oldColors, newColors);
+                    } else if (!voicecolorNotif.Validate) {
+                        // Cases where this function was intentionally invoked
+                        MessageBox.Show(this, ThemeManager.GetString("dialogs.voicecolorremapping.error"), ThemeManager.GetString("errors.caption"), MessageBox.MessageBoxButtons.Ok);
                     }
                 }
             }

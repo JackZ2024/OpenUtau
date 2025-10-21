@@ -45,6 +45,7 @@
   <Color x:Key="BlackKeyColorLeft">Transparent</Color>
   <Color x:Key="BlackKeyColorRight">Transparent</Color>
   <Color x:Key="BlackKeyNameColor">#FFFFFF</Color>
-
+  <!-- add by Jack -->
   <Color x:Key="DragSplitLineColor">#EEEEEE</Color>
+  <!-- end add -->
 </ResourceDictionary>

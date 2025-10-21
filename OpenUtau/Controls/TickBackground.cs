@@ -199,7 +199,7 @@ namespace OpenUtau.App.Controls {
                     textLayout.Draw(context, new Point());
                 }
             }
-
+            // add by Jack
             foreach (var key in project.keys) {
                 project.timeAxis.TickPosToBarBeat(key.position, out int timebar, out int _, out int _);
                 int index = project.timeSignatures.FindIndex(time => time.barPosition == timebar);
@@ -213,6 +213,7 @@ namespace OpenUtau.App.Controls {
                     textLayout.Draw(context, new Point());
                 }
             }
+            // end add
         }
     }
 }

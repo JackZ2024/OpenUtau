@@ -31,6 +31,7 @@ namespace OpenUtau.Core.Ustx {
         }
         public override string ToString() => $"{beatPerBar}/{beatUnit}@bar{barPosition}";
     }
+    // add by Jack
     public class UKey {
         public int position;
         public int key;
@@ -42,7 +43,7 @@ namespace OpenUtau.Core.Ustx {
         }
         public override string ToString() => $"{key}@{position}";
     }
-
+    // end add
     public class UProject {
         public string name = "New Project";
         public string comment = string.Empty;
@@ -60,10 +61,14 @@ namespace OpenUtau.Core.Ustx {
         public string[] expSelectors = new string[] { Format.Ustx.DYN, Format.Ustx.PITD, Format.Ustx.CLR, Format.Ustx.ENG, Format.Ustx.VEL, Format.Ustx.VOL, Format.Ustx.ATK, Format.Ustx.DEC, Format.Ustx.GEN, Format.Ustx.BRE };
         public int expPrimary = 0;
         public int expSecondary = 1;
+        // modify by Jack
         //public int key = 0;//Music key of the project, 0 = C, 1 = C#, 2 = D, ..., 11 = B
+        // end modify
         public List<UTimeSignature> timeSignatures;
         public List<UTempo> tempos;
+        // add by Jack
         public List<UKey> keys; //Music key of the project, 0 = C, 1 = C#, 2 = D, ..., 11 = B
+        // end add
         public List<UTrack> tracks;
         [YamlIgnore] public List<UPart> parts;
         [YamlIgnore] public bool SoloTrackExist { get => tracks.Any(t => t.Solo); }
@@ -86,7 +91,7 @@ namespace OpenUtau.Core.Ustx {
         public UProject() {
             timeSignatures = new List<UTimeSignature> { new UTimeSignature(0, 4, 4) };
             tempos = new List<UTempo> { new UTempo(0, 120) };
-            keys = new List<UKey> { new UKey(0, 0) };
+            keys = new List<UKey> { new UKey(0, 0) }; // add by Jack
             tracks = new List<UTrack>() { new UTrack("Track1") };
             parts = new List<UPart>();
             timeAxis.BuildSegments(this);
@@ -144,7 +149,7 @@ namespace OpenUtau.Core.Ustx {
             note.duration = durTick;
             return note;
         }
-
+        // add by Jack
         public int GetCurKey(int tick) {
             int curKey = 0;
             foreach(var key in keys) {
@@ -190,7 +195,7 @@ namespace OpenUtau.Core.Ustx {
             }
             return (curTimeSignature == null ? timeSignatures[0] : curTimeSignature);
         }
-
+        // end add
         public void BeforeSave() {
             foreach (var track in tracks) {
                 track.BeforeSave();

@@ -25,7 +25,7 @@ namespace OpenUtau.App.ViewModels {
         public float X;
         public float Y;
     }
-
+    // add by Jack
     public struct CurvePointHitInfo {
         public UCurve Curve;
         public int Index;
@@ -37,7 +37,7 @@ namespace OpenUtau.App.ViewModels {
         public int Index;
         public bool OnPoint;
     }
-
+    // end add
     public struct VibratoHitInfo {
         public UNote note;
         public bool hit;
@@ -212,7 +212,7 @@ namespace OpenUtau.App.ViewModels {
             }
             return default;
         }
-
+        // add by Jack
         public CurvePointHitInfo HitTestCurvePoint(Point point, double height) {
   
             var project = viewModel.Project;
@@ -280,6 +280,7 @@ namespace OpenUtau.App.ViewModels {
 
             return result;
         }
+        // end add
         public double? SamplePitch(Point point) {
             if (viewModel.Part == null) {
                 return null;

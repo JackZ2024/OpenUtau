@@ -58,7 +58,7 @@ namespace OpenUtau.Core.DiffSinger {
         public bool predict_tension = false;
         public bool use_expr = false;
         public bool use_note_rest = false;
-        public bool use_glide_embed = false;
+        public bool use_glide_embed = false; // add by Luke
         public int sample_rate = 44100;
         public int hop_size = 512;
         public int win_size = 2048;

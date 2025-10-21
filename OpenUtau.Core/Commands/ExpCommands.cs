@@ -343,7 +343,7 @@ namespace OpenUtau.Core {
                 first.oldXs, first.oldYs, newXs, newYs);
         }
     }
-
+    // add by Jack
     public class MoveCurvePointsCommand : ExpCommand {
         readonly UProject project;
         readonly string abbr;
@@ -557,6 +557,7 @@ namespace OpenUtau.Core {
             }
         }
     }
+    // end add
     public class MergedSetCurveCommand : ExpCommand {
         readonly UProject project;
         readonly string abbr;

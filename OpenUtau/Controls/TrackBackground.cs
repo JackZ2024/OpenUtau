@@ -63,11 +63,14 @@ namespace OpenUtau.App.Controls {
         private bool _isPianoRoll;
         private bool _isKeyboard;
         private int _key;
+        // add by Jack
         private int _tick;
+        // end add
 
         public TrackBackground() {
             MessageBus.Current.Listen<ThemeChangedEvent>()
                 .Subscribe(e => InvalidateVisual());
+            // add by Jack
             MessageBus.Current.Listen<SeekPlayPosChangedEvent>()
                 .Subscribe(e => {
                     if (_tick != e.curTick) {
@@ -75,6 +78,7 @@ namespace OpenUtau.App.Controls {
                         InvalidateVisual();
                     } 
                 });
+            // end add
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change) {
@@ -97,7 +101,9 @@ namespace OpenUtau.App.Controls {
             }
             int track = (int)TrackOffset;
             double top = TrackHeight * (track - TrackOffset);
+            // add by Jack
             int key = DocManager.Inst.Project == null ? 0 : DocManager.Inst.Project.GetCurKey(_tick);
+            // end add
             string[] degreeNames;
             switch(Preferences.Default.DegreeStyle){
                 case 1:
@@ -132,7 +138,7 @@ namespace OpenUtau.App.Controls {
                         toneTextLayout.Draw(context, new Point());
                     }
                     //scale degree display
-                    int degree = mod(tone - key, 12);
+                    int degree = mod(tone - Key, 12);
                     string degreeName = degreeNames[degree];
                     var degreeTextLayout = TextLayoutCache.Get(degreeName, brush, 12);
                     var degreeTextPosition = new Point(4, (int)(top + (TrackHeight - degreeTextLayout.Height) / 2));

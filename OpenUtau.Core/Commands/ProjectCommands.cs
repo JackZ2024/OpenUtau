@@ -67,6 +67,7 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => $"Del tempo change {bpm} at {tick}";
     }
+    // add by Jack
     public class MoveTempoChangeCommand : ProjectCommand {
         protected int tick;
         protected int index;
@@ -152,7 +153,7 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => $"Move Key change {tick} at {index}";
     }
-
+    // end add
     public class AddTimeSigCommand : ProjectCommand {
         protected int bar;
         protected int beatPerBar;
@@ -202,6 +203,7 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => $"Del time sig change {beatPerBar}/{beatUnit} at bar {bar}";
     }
+    // add by Jack
     public class MoveTimeSigCommand : ProjectCommand {
         protected int index;
         protected int moveLen;
@@ -221,7 +223,7 @@ namespace OpenUtau.Core {
         }
         public override string ToString() => $"Move time sig change";
     }
-
+    // end add
     public class TimeSignatureCommand : ProjectCommand {
         public readonly int oldBeatPerBar;
         public readonly int oldBeatUnit;
@@ -247,19 +249,23 @@ namespace OpenUtau.Core {
     public class KeyCommand : ProjectCommand{
         public readonly int oldKey;
         public readonly int newKey;
+        // change by Jack
         public readonly int tick;
         public KeyCommand(UProject project, int key, int tick) : base(project) {
             this.tick = tick;
             oldKey = project.GetCurKey(tick);
             newKey = key;
         }
+        // end change
         public override string ToString() => $"Change key from {oldKey} to {newKey}";
+        // change by Jack
         public override void Execute() {
             project.UpdateKey(tick, newKey);
         }
         public override void Unexecute() {
             project.UpdateKey(tick, oldKey);
         }
+        // end change
     }
 
     public class ConfigureExpressionsCommand : ProjectCommand {

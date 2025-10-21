@@ -380,6 +380,7 @@ namespace OpenUtau.Core.Editing {
             });
         }
     }
+    // add by Jack
     public class LoadRenderedPitchForSelectedNote : BatchEdit {
         public virtual string Name => name;
 
@@ -487,7 +488,7 @@ namespace OpenUtau.Core.Editing {
             });
         }
     }
-
+    // end add
     public class BakePitch : BatchEdit {
         public virtual string Name => name;
         private string name;

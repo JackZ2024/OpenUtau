@@ -30,7 +30,9 @@ namespace OpenUtau.App {
         public static readonly Cursor cursorSizeAll = new Cursor(StandardCursorType.SizeAll);
         public static readonly Cursor cursorSizeNS = new Cursor(StandardCursorType.SizeNorthSouth);
         public static readonly Cursor cursorSizeWE = new Cursor(StandardCursorType.SizeWestEast);
+        // add by Jack
         public static readonly Cursor cursorDragMove = new Cursor(StandardCursorType.DragMove);
+        // end add
 
         public const int PosMarkerHightlighZIndex = -100;
 
@@ -51,5 +53,8 @@ namespace OpenUtau.App {
         public const int ExpressionHiddenZIndex = 0;
         public const int ExpressionVisibleZIndex = 200;
         public const int ExpressionShadowZIndex = 100;
+
+        public const double ExpHeightMin = 132;
+        public const double ExpHeightMax = 600;
     }
 }

@@ -47,11 +47,11 @@ namespace OpenUtau.App.Controls {
 
         private Dictionary<UTrack, TrackHeader> trackHeaders = new Dictionary<UTrack, TrackHeader>();
         private TrackAdder? trackAdder;
-
+        // add by Jack
         private TrackHeader? curTrackHeader = null;
         private TrackHeader? lastTrackHeader = null;
         private UTrack? dragTrack = null;
-
+        // end add
         public TrackHeaderCanvas() {
             MessageBus.Current.Listen<TracksRefreshEvent>()
                 .Subscribe(_ => {
@@ -154,7 +154,7 @@ namespace OpenUtau.App.Controls {
                     break;
             }
         }
-
+        // add by Jack
         public string StartDrag(Point point) {
             lastTrackHeader = null;
             dragTrack = null;
@@ -237,7 +237,7 @@ namespace OpenUtau.App.Controls {
             lastTrackHeader = null;
             dragTrack = null;
         }
-
+        // end add
         void Add(UTrack track) {
             var vm = new TrackHeaderViewModel(track);
             var header = new TrackHeader() {

@@ -20,7 +20,7 @@ using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
 using ReactiveUI;
 using Serilog;
-using OpenUtau.Core.Metronome;
+using OpenUtau.Core.Metronome; // add by Jack
 using Avalonia.Threading;
 
 namespace OpenUtau.App.Views {
@@ -40,14 +40,16 @@ namespace OpenUtau.App.Views {
         private NoteEditState? editState;
         private Point valueTipPointerPosition;
         private bool shouldOpenNotesContextMenu;
+        // add by Jack
         private DispatcherTimer _remarkTimer;
         private Point lastPoint;
         private URemark? CopyRemark;
+        // end add
 
         private ReactiveCommand<Unit, Unit> lyricsDialogCommand;
         private ReactiveCommand<Unit, Unit> noteDefaultsCommand;
         private ReactiveCommand<BatchEdit, Unit> noteBatchEditCommand;
-
+        // add by Jack
         public ReactiveCommand<int, Unit> RemarkAddCommand;
         public ReactiveCommand<RemarkHitInfo, Unit> RemarkEditCommand;
         public ReactiveCommand<RemarkHitInfo, Unit> RemarkDelCommand;
@@ -55,11 +57,12 @@ namespace OpenUtau.App.Views {
         public ReactiveCommand<int, Unit> RemarkPasteCommand;
 
         public ReactiveCommand<int, Unit> BarsEditCommand;
-
+        // end add
         public PianoRollWindow() {
             InitializeComponent();
             DataContext = ViewModel = new PianoRollViewModel();
             ValueTip.IsVisible = false;
+            // add by Jack
             _remarkTimer = new DispatcherTimer {
                 Interval = TimeSpan.FromMilliseconds(600)
             };
@@ -86,6 +89,7 @@ namespace OpenUtau.App.Views {
                 }
             }
             catch { }
+            // end add
 
             noteBatchEditCommand = ReactiveCommand.Create<BatchEdit>(async edit => {
                 var NotesVm = ViewModel?.NotesViewModel;
@@ -131,7 +135,7 @@ namespace OpenUtau.App.Views {
             });
             ViewModel.NoteBatchEdits.AddRange(new List<BatchEdit>() {
                 new LoadRenderedPitch(),
-                new LoadRenderedPitchForSelectedNote(),
+                new LoadRenderedPitchForSelectedNote(), // add by Jack
                 new RefreshRealCurves(),
                 new AddTailNote("-", "pianoroll.menu.notes.addtaildash"),
                 new AddTailNote("R", "pianoroll.menu.notes.addtailrest"),
@@ -146,7 +150,7 @@ namespace OpenUtau.App.Views {
                 Header = ThemeManager.GetString(edit.Name),
                 Command = noteBatchEditCommand,
                 CommandParameter = edit,
-                InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null,
+                InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null, // add by Jack
             }));
             ViewModel.LyricBatchEdits.AddRange(new List<BatchEdit>() {
                 new RomajiToHiragana(),
@@ -158,12 +162,13 @@ namespace OpenUtau.App.Views {
                 new MoveSuffixToVoiceColor(),
                 new RemovePhoneticHint(),
                 new DashToPlus(),
+                new DashToPlusTilda(),
                 new InsertSlur(),
             }.Select(edit => new MenuItemViewModel() {
                 Header = ThemeManager.GetString(edit.Name),
                 Command = noteBatchEditCommand,
                 CommandParameter = edit,
-                InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null,
+                InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null, // add by Jack
             }));
             ViewModel.ResetBatchEdits.AddRange(new List<BatchEdit>() {
                 new ResetAll(),
@@ -173,52 +178,56 @@ namespace OpenUtau.App.Views {
                 new ResetVibratos(),
                 new ClearTimings(),
                 new ResetAliases(),
-                new ResetPhonemes(),
             }.Select(edit => new MenuItemViewModel() {
                 Header = ThemeManager.GetString(edit.Name),
                 Command = noteBatchEditCommand,
                 CommandParameter = edit,
-                InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null,
+                InputGesture = gestureDict.ContainsKey(edit.Name) ? KeyGesture.Parse(gestureDict[edit.Name]) : null, // add by Jack
             }));
             DocManager.Inst.AddSubscriber(this);
-
-            ViewModel.NoteBatchEdits.Insert(6, new MenuItemViewModel() {
+            // modify by Jack
+            ViewModel.NoteBatchEdits.Insert(7, new MenuItemViewModel() {
                 Header = ThemeManager.GetString("pianoroll.menu.notes.addbreath"),
-                InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.addbreath") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.addbreath"]) : null,
+                InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.addbreath") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.addbreath"]) : null, // add by Jack
                 Command = ReactiveCommand.Create(() => {
                     AddBreathNote();
                 })
             });
-            ViewModel.NoteBatchEdits.Insert(7, new MenuItemViewModel() {
+            // end modify
+            // add by Jack
+            ViewModel.NoteBatchEdits.Insert(8, new MenuItemViewModel() {
                 Header = ThemeManager.GetString("pianoroll.menu.notes.deleteallbreath"),
                 InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.deleteallbreath") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.deleteallbreath"]) : null,
                 Command = ReactiveCommand.Create(() => {
                     DelBreathNote(true);
                 })
             });
-            ViewModel.NoteBatchEdits.Insert(8, new MenuItemViewModel() {
+            ViewModel.NoteBatchEdits.Insert(9, new MenuItemViewModel() {
                 Header = ThemeManager.GetString("pianoroll.menu.notes.deletebreathonlyselected"),
                 InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.deletebreathonlyselected") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.deletebreathonlyselected"]) : null,
                 Command = ReactiveCommand.Create(() => {
                     DelBreathNote(false);
                 })
             });
-            ViewModel.NoteBatchEdits.Insert(9, new MenuItemViewModel() {
+            // end add
+            // modify by Jack
+            ViewModel.NoteBatchEdits.Insert(12, new MenuItemViewModel() {
                 Header = ThemeManager.GetString("pianoroll.menu.notes.quantize"),
                 Command = ReactiveCommand.Create(() => {
                     QuantizeNotes();
                 })
             });
+            // end modify
             ViewModel.NoteBatchEdits.Add(new MenuItemViewModel() {
                 Header = ThemeManager.GetString("pianoroll.menu.notes.lengthencrossfade"),
-                InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.lengthencrossfade") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.lengthencrossfade"]) : null,
+                InputGesture = gestureDict.ContainsKey("pianoroll.menu.notes.lengthencrossfade") ? KeyGesture.Parse(gestureDict["pianoroll.menu.notes.lengthencrossfade"]) : null, // add by Jack
                 Command = ReactiveCommand.Create(() => {
                     LengthenCrossfade();
                 })
             });
             ViewModel.LyricBatchEdits.Add(new MenuItemViewModel() {
                 Header = ThemeManager.GetString("lyricsreplace.replace"),
-                InputGesture = gestureDict.ContainsKey("lyricsreplace.replace") ? KeyGesture.Parse(gestureDict["lyricsreplace.replace"]) : null,
+                InputGesture = gestureDict.ContainsKey("lyricsreplace.replace") ? KeyGesture.Parse(gestureDict["lyricsreplace.replace"]) : null, // add by Jack
                 Command = ReactiveCommand.Create(() => {
                     ReplaceLyrics();
                 })
@@ -229,6 +238,7 @@ namespace OpenUtau.App.Views {
             noteDefaultsCommand = ReactiveCommand.Create(() => {
                 EditNoteDefaults();
             });
+            // add by Jack
             RemarkAddCommand = ReactiveCommand.Create<int>(pos => {
                 if (ViewModel?.NotesViewModel.Part == null) { return; }
                 var vm = new RemarkViewModel(ViewModel.NotesViewModel.Part, new URemark(), pos, -1);
@@ -280,6 +290,7 @@ namespace OpenUtau.App.Views {
                 };
                 dialog.ShowDialog(this);
             });
+            // end add
 
             this.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
 
@@ -447,14 +458,14 @@ namespace OpenUtau.App.Views {
                 dialog.Position = dialog.Position.WithY(0);
             }
         }
-
+        // add by Jack
         void OnMenuCurveEdit(object sender, RoutedEventArgs args) {
             var dialog = new BatchAdjustCurve() {
                 DataContext = ViewModel.NotesViewModel
             };
             dialog.ShowDialog(this);
         }
-
+        // end add
         void AddBreathNote() {
             var notesVM = ViewModel.NotesViewModel;
             if (notesVM.Part == null) {
@@ -485,6 +496,7 @@ namespace OpenUtau.App.Views {
             dialog.SetText("br");
             dialog.ShowDialog(this);
         }
+        // add by Jack
         void DelBreathNote(bool all=true) {
             var notesVM = ViewModel.NotesViewModel;
             if (notesVM.Part == null) {
@@ -529,7 +541,7 @@ namespace OpenUtau.App.Views {
             dialog.SetText(Preferences.Default.BreathNoteString);
             dialog.ShowDialog(this);
         }
-
+        // end add
         void QuantizeNotes() {
             var notesVM = ViewModel.NotesViewModel;
             if (notesVM.Part == null) {
@@ -639,6 +651,7 @@ namespace OpenUtau.App.Views {
                 ViewModel.NotesViewModel.PointToLineTick(point.Position, out int left, out int right);
                 int tick = left + ViewModel.NotesViewModel.Part?.position ?? 0;
                 ViewModel.PlaybackViewModel?.MovePlayPos(tick);
+            // add by Jack
             } else if (point.Properties.IsRightButtonPressed) {
                 lastPoint = new Point();
                 var remarkHitInfo = ViewModel.NotesViewModel.HitTest.HitTestRemark(point.Position);
@@ -685,20 +698,21 @@ namespace OpenUtau.App.Views {
                 shouldOpenNotesContextMenu = true;
                 return;
             }
-
+            // end add
             LyricBox?.EndEdit();
         }
 
         public void TimelinePointerMoved(object sender, PointerEventArgs args) {
             var control = (Control)sender;
             var point = args.GetCurrentPoint(control);
-            lastPoint = point.Position;
+            lastPoint = point.Position; // add by Jack
             if (point.Properties.IsLeftButtonPressed) {
                 ViewModel.NotesViewModel.PointToLineTick(point.Position, out int left, out int right);
                 int tick = left + ViewModel.NotesViewModel.Part?.position ?? 0;
                 ViewModel.PlaybackViewModel?.MovePlayPos(tick);
-                return;
+                return;  // add by Jack
             }
+            // add by Jack
             if (ValueTipCanvas != null) {
                 valueTipPointerPosition = args.GetCurrentPoint(ValueTipCanvas!).Position;
             }
@@ -713,11 +727,13 @@ namespace OpenUtau.App.Views {
                     _remarkTimer.Stop();
                 }
             }
+            // end add
         }
 
         public void TimelinePointerReleased(object sender, PointerReleasedEventArgs args) {
             args.Pointer.Capture(null);
         }
+        // add by Jack
         public void TimeDoubleTapped(object sender, TappedEventArgs args) {
             if (!(sender is Control control)) {
                 return;
@@ -1025,6 +1041,7 @@ namespace OpenUtau.App.Views {
                             Header = ThemeManager.GetString("context.note.clearcache"),
                             Command = ViewModel.ClearPhraseCacheCommand,
                         });
+                        // add by Jack
                         if (selectedNotes.Count == 2) {
                             if (selectedNotes[0].tone == selectedNotes[1].tone && 
                                 (selectedNotes[0].End == selectedNotes[1].position || 
@@ -1036,6 +1053,7 @@ namespace OpenUtau.App.Views {
                                 });
                             }
                         }
+                        // end add
                         shouldOpenNotesContextMenu = true;
                         return;
                     }
@@ -1104,7 +1122,7 @@ namespace OpenUtau.App.Views {
             }
             var control = (Control)sender;
             var point = args.GetCurrentPoint(control);
-            if(editState is not SmoothenPitchState)
+            if(editState is not SmoothenPitchState) // add by Jack
             editState.Update(point.Pointer, point.Position);
             editState.End(point.Pointer, point.Position);
             editState = null;
@@ -1134,6 +1152,7 @@ namespace OpenUtau.App.Views {
             var position = args.GetCurrentPoint(control).Position;
             var size = control.Bounds.Size;
             var delta = args.Delta;
+            // change by Jack
             if (args.KeyModifiers == (cmdKey | KeyModifiers.Shift) && ViewModel.NotesViewModel.ShowWaveform) {
                 if (delta.Y > 0) {
                     ViewModel.NotesViewModel.WavShapeBorderHeight = Math.Clamp(ViewModel.NotesViewModel.WavShapeBorderHeight + 10, 60, 300);
@@ -1142,6 +1161,7 @@ namespace OpenUtau.App.Views {
                 }
             }
             else if(args.KeyModifiers == KeyModifiers.None || args.KeyModifiers == KeyModifiers.Shift) {
+            // end change
                 if (args.KeyModifiers == KeyModifiers.Shift) {
                     delta = new Vector(delta.Y, delta.X);
                 }
@@ -1188,23 +1208,28 @@ namespace OpenUtau.App.Views {
                 return;
             }
             if (point.Properties.IsLeftButtonPressed) {
+                // change by Jack
                 if(ViewModel.NotesViewModel.IsEditCurve) {
                     ExpCanvasLeftPointerPressed(control, point, args);
                 } else {
                 editState = new ExpSetValueState(control, ViewModel, this);
                 }
+                // end change
             } else if (point.Properties.IsRightButtonPressed) {
                 editState = new ExpResetValueState(control, ViewModel, this);
                 Cursor = ViewConstants.cursorNo;
+                // add by Jack
             } else if (point.Properties.IsMiddleButtonPressed) {
                 editState = new ExpCurvePanningState(control, ViewModel, this);
                 Cursor = ViewConstants.cursorHand;
             }
+            // end add
             if (editState != null) {
                 editState.Begin(point.Pointer, point.Position);
                 editState.Update(point.Pointer, point.Position, args);
             }
         }
+        // add by Jack
         private void ExpCanvasLeftPointerPressed(Control control, PointerPoint point, PointerPressedEventArgs args) {
 
             var curveHitInfo = ViewModel.NotesViewModel.HitTest.HitTestCurvePoint(point.Position, control.Bounds.Height);
@@ -1234,6 +1259,7 @@ namespace OpenUtau.App.Views {
                 ViewModel.NotesViewModel.LastSelectionPoint = -1;
             }
         }
+        // end add
         public void ExpCanvasPointerMoved(object sender, PointerEventArgs args) {
             var control = (Control)sender;
             var point = args.GetCurrentPoint(control);
@@ -1244,6 +1270,7 @@ namespace OpenUtau.App.Views {
             if (editState != null) {
                 editState.Update(point.Pointer, point.Position, args);
             } else {
+                // add by Jack
                 if (ViewModel.NotesViewModel.IsEditCurve) {
                     var curveHitInfo = ViewModel.NotesViewModel.HitTest.HitTestCurvePoint(point.Position, control.Bounds.Height);
                     if (curveHitInfo.OnPoint) {
@@ -1252,9 +1279,10 @@ namespace OpenUtau.App.Views {
                 Cursor = null;
             }
                 } else {
-                    Cursor = null;
-                }
+                Cursor = null;
             }
+            // end add
+        }
         }
 
         public void ExpCanvasPointerReleased(object sender, PointerReleasedEventArgs args) {
@@ -1271,6 +1299,7 @@ namespace OpenUtau.App.Views {
             editState = null;
             Cursor = null;
         }
+        // add by Jack
         public void ExpCanvasPointerWheelChanged(object sender, PointerWheelEventArgs args) {
             LyricBox?.EndEdit();
             var control = (Control)sender;
@@ -1300,7 +1329,7 @@ namespace OpenUtau.App.Views {
                 editState.Update(point.Pointer, point.Position);
             }
         }
-
+        // end add
         public void PhonemeCanvasDoubleTapped(object sender, TappedEventArgs args) {
             if (ViewModel?.NotesViewModel?.Part == null) {
                 return;
@@ -1566,9 +1595,10 @@ namespace OpenUtau.App.Views {
             bool isCtrl = args.KeyModifiers == cmdKey;
             bool isShift = args.KeyModifiers == KeyModifiers.Shift;
             bool isBoth = args.KeyModifiers == (cmdKey | KeyModifiers.Shift);
+            // add by Jack
             bool isCtrlAlt = args.KeyModifiers == (cmdKey | KeyModifiers.Alt);
             bool isShiftAlt = args.KeyModifiers == (KeyModifiers.Shift | KeyModifiers.Alt);
-
+            // end add
             if (PluginMenu.IsSubMenuOpen && isNone) {
                 if (ViewModel.LegacyPluginShortcuts.ContainsKey(args.Key)) {
                     var plugin = ViewModel.LegacyPluginShortcuts[args.Key];
@@ -1578,7 +1608,7 @@ namespace OpenUtau.App.Views {
                 }
                 return true;
             }
-
+            // add by Jack
             foreach (MenuItemViewModel menu in ViewModel.NoteBatchEdits) {
                 if(menu.InputGesture != null) {
                     if (menu.InputGesture.Matches(args)) {
@@ -1604,7 +1634,7 @@ namespace OpenUtau.App.Views {
                     }
                 }
             }
-
+            // end add
             string mainPenIdx = Preferences.Default.PenPlusDefault ? "2+" : "2";
             string altPenIdx = Preferences.Default.PenPlusDefault ? "2" : "2+";
 
@@ -1613,7 +1643,6 @@ namespace OpenUtau.App.Views {
                 case Key.Space:
                     if (isNone) {
                         playVm.PlayOrPause();
-                        
                         return true;
                     }
                     if (isAlt) {
@@ -1768,10 +1797,12 @@ namespace OpenUtau.App.Views {
                         notesVm.ShowTips = !notesVm.ShowTips;
                         return true;
                     }
+                    // add by Jack
                     if (isAlt) {
                         EditLyrics(); ;
                         return true;
                     }
+                    // end add
                     break;
                 case Key.U:
                     if (isNone) {
@@ -1792,6 +1823,12 @@ namespace OpenUtau.App.Views {
                 case Key.O:
                     if (isNone) {
                         notesVm.ShowPhoneme = !notesVm.ShowPhoneme;
+                        return true;
+                    }
+                    break;
+                case Key.L:
+                    if (isNone) {
+                        notesVm.ShowExpressions = !notesVm.ShowExpressions;
                         return true;
                     }
                     break;
@@ -1818,50 +1855,60 @@ namespace OpenUtau.App.Views {
                         notesVm.TransposeSelection(1);
                         return true;
                     }
+                    // add by Jack
                     if(isCtrlAlt) {
                         notesVm.MoveSelectionCurvePoints(0, 10);
                     }
                     if(isShiftAlt) {
                         notesVm.MoveSelectionCurvePoints(0, 1);
                     }
+                    // end add
                     if (isCtrl) {
                         notesVm.TransposeSelection(12);
                         return true;
                     }
+                    // add by Jack
                     if(isAlt) {
                         MetronomePlayer.Instance.Volume += 0.1f;
                     }
+                    // end add
                     break;
                 case Key.Down:
                     if (isNone) {
                         notesVm.TransposeSelection(-1);
                         return true;
                     }
+                    // add by Jack
                     if (isCtrlAlt) {
                         notesVm.MoveSelectionCurvePoints(0, -10);
                     }
                     if (isShiftAlt) {
                         notesVm.MoveSelectionCurvePoints(0, -1);
                     }
+                    // end add
                     if (isCtrl) {
                         notesVm.TransposeSelection(-12);
                         return true;
                     }
+                    // add by Jack
                     if (isAlt) {
                         MetronomePlayer.Instance.Volume -= 0.1f;
                     }
+                    // end add
                     break;
                 case Key.Left:
                     if (isNone) {
                         notesVm.MoveCursor(-1);
                         return true;
                     }
+                    // add by Jack
                     if (isCtrlAlt) {
                         notesVm.MoveSelectionCurvePoints(-50, 0);
                     }
                     if (isShiftAlt) {
                         notesVm.MoveSelectionCurvePoints(-5, 0);
                     }
+                    // end add
                     if (isAlt) {
                         notesVm.ResizeSelectedNotes(-1 * deltaTicks);
                         return true;
@@ -1880,12 +1927,14 @@ namespace OpenUtau.App.Views {
                         notesVm.MoveCursor(1);
                         return true;
                     }
+                    // add by Jack
                     if (isCtrlAlt) {
                         notesVm.MoveSelectionCurvePoints(50, 0);
                     }
                     if (isShiftAlt) {
                         notesVm.MoveSelectionCurvePoints(5, 0);
                     }
+                    // end add
                     if (isAlt) {
                         notesVm.ResizeSelectedNotes(deltaTicks);
                         return true;
@@ -1939,10 +1988,12 @@ namespace OpenUtau.App.Views {
                         notesVm.CopyNotes();
                         return true;
                     }
+                    // add by Jack
                     if(isShift) {
                         notesVm.CopyCurvePoints();
                         return true;
                     }
+                    // end add
                     break;
                 case Key.X:
                     if (isCtrl) {
@@ -1959,10 +2010,12 @@ namespace OpenUtau.App.Views {
                         notesVm.PasteSelectedParams(this);
                         return true;
                     }
+                    // add by Jack
                     if(isShift) {
                         notesVm.PasteCurvePoints();
                         return true;
                     }
+                    // end add
                     break;
                 case Key.N:
                     if (isNone && PluginMenu.Parent is MenuItem batch) {
@@ -1984,10 +2037,12 @@ namespace OpenUtau.App.Views {
                         notesVm.DeleteSelectedNotes();
                         return true;
                     }
+                    // add by Jack
                     if(isShift) {
                         notesVm.DeleteCurvePoints();
                         return true;
                     }
+                    // end add
                     break;
                 #endregion
                 #region play position and select keys
@@ -2156,11 +2211,13 @@ namespace OpenUtau.App.Views {
                         notesVm.OnXZoomed(new Point(x, y), 0.1);
                         return true;
                     }
+                    // add by Jack
                     if(isCtrl) {
                         notesVm.IsEditCurve = !notesVm.IsEditCurve;
                         MessageBus.Current.SendMessage(new CurvesRefreshEvent());
                         return true;
                     }
+                    // end add
                     break;
                 case Key.Q:
                     // zoom out
@@ -2178,7 +2235,7 @@ namespace OpenUtau.App.Views {
                         return true;
                     }
                     break;
-                    #endregion
+                #endregion
                 #region move to the next track part
                 case Key.PageUp: {
                         if (isNone) {

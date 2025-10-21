@@ -23,6 +23,7 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<UPart, Unit>? PartGotoFileCommand { get; set; }
         public ReactiveCommand<UPart, Unit>? PartReplaceAudioCommand { get; set; }
         public ReactiveCommand<UPart, Unit>? PartTranscribeCommand { get; set; }
+        public ReactiveCommand<UPart, Unit>? PartMergeCommand { get; set; }
     }
 
     public class RecentFileInfo {
@@ -72,10 +73,11 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<int, Unit>? DelTempoChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? AddTimeSigChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? DelTimeSigChangeCmd { get; set; }
+        // add by Jack
         public ReactiveCommand<int, Unit>? AddKeyChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? DelKeyChangeCmd { get; set; }
         public ReactiveCommand<int, Unit>? BarsEditCmd { get; set; }
-
+        // end add
         private ObservableCollectionExtended<MenuItemViewModel> openRecentMenuItems
             = new ObservableCollectionExtended<MenuItemViewModel>();
         private ObservableCollectionExtended<MenuItemViewModel> openTemplatesMenuItems
@@ -331,10 +333,9 @@ namespace OpenUtau.App.ViewModels {
                 TimelineContextMenuItems.Add(new MenuItemViewModel {
                     Header = string.Format(template, left),
                     Command = AddTempoChangeCmd,
-                    CommandParameter = left,
                 });
             }
-
+            // add by Jack
             var key = project.keys.LastOrDefault(k => k.position < tick);
             if (key != null && key.position > 0 && (tick - key.position) * TracksViewModel.TickWidth < 40) {
                 TimelineContextMenuItems.Add(new MenuItemViewModel {
@@ -356,6 +357,7 @@ namespace OpenUtau.App.ViewModels {
                     CommandParameter = tick,
                 });
             }
+            // end add
         }
 
         /// <summary>

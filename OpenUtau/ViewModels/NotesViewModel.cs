@@ -13,7 +13,7 @@ using DynamicData;
 using DynamicData.Binding;
 using OpenUtau.App.Views;
 using OpenUtau.Core;
-using OpenUtau.Core.Metronome;
+using OpenUtau.Core.Metronome;  // add by Jack
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
 using ReactiveUI;
@@ -31,6 +31,7 @@ namespace OpenUtau.App.ViewModels {
             tempSelectedNotes = selection.TempSelectedNotes.ToArray();
         }
     }
+    // add by Jack
     public class CurvesRefreshEvent { }
     public class CurvePointsSelectionEvent {
         public readonly int[] selectedPoints;
@@ -38,6 +39,7 @@ namespace OpenUtau.App.ViewModels {
             selectedPoints = selection.ToArray();
         }
     }
+    // end add
     public class WaveformRefreshEvent { }
 
     public class NotesViewModel : ViewModelBase, ICmdSubscriber {
@@ -75,6 +77,7 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public bool ShowWaveform { get; set; }
         [Reactive] public bool ShowPhoneme { get; set; }
         [Reactive] public bool ShowNoteParams { get; set; }
+        [Reactive] public bool ShowExpressions { get; set; }
         [Reactive] public bool IsSnapOn { get; set; }
         [Reactive] public string SnapDivText { get; set; }
         [Reactive] public string KeyText { get; set; }
@@ -84,6 +87,8 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public string SecondaryKey { get; set; }
         [Reactive] public double ExpTrackHeight { get; set; }
         [Reactive] public double ExpShadowOpacity { get; set; }
+        [Reactive] public double ExpHeightMin { get; set; }
+        [Reactive] public double ExpHeightMax { get; set; }
         [Reactive] public UVoicePart? Part { get; set; }
         [Reactive] public Bitmap? Avatar { get; set; }
         [Reactive] public Bitmap? Portrait { get; set; }
@@ -99,14 +104,14 @@ namespace OpenUtau.App.ViewModels {
         public UProject Project => DocManager.Inst.Project;
         [Reactive] public List<MenuItemViewModel> SnapDivs { get; set; }
         [Reactive] public List<MenuItemViewModel> Keys { get; set; }
-
+        // add by Jack
         [Reactive] public bool IsMetronomePlaying { get; set; }
         public ReactiveCommand<Unit, Unit> MetronomePlay { get; }
         [Reactive] public bool IsEditCurve { get; set; }
         public ReactiveCommand<Unit, Unit> EditCurveStart { get; }
         [Reactive] public bool LockStartTime { get; set; }
         public ReactiveCommand<Unit, Unit> LockStartTimeCommand { get; set; }
-
+        // end add
         public ReactiveCommand<int, Unit> SetSnapUnitCommand { get; set; }
         public ReactiveCommand<int, Unit> SetKeyCommand { get; set; }
 
@@ -119,21 +124,22 @@ namespace OpenUtau.App.ViewModels {
         private readonly ObservableAsPropertyHelper<double> smallChangeY;
 
         public readonly NoteSelectionViewModel Selection = new NoteSelectionViewModel();
-
+        // add by Jack
         public readonly List<int> SelectionPoints = new List<int>();
         public readonly List<int> tmpSelectionPoints = new List<int>();
         public  int LastSelectionPoint { get; set; } = -1;
         public Point LastSelectionPos { get; set; }
         public string CopyCurveType { get; set; } = "";
         public readonly List<int> CopyPoints = new List<int>();
-
+        // end add
         internal NotesViewModelHitTest HitTest;
         private int _lastNoteLength = 480;
         private string? portraitSource;
         private readonly object portraitLock = new object();
         private int userSnapDiv = -2;
         //private int userKey => Project.key;
-
+        
+        // add by Jack
         private int _wavShapeBorderHeight = 60;
         [Reactive] public int WavShapeBorderHeight {
             get => _wavShapeBorderHeight;
@@ -150,7 +156,7 @@ namespace OpenUtau.App.ViewModels {
         [Reactive] public int offsetValue { get; set; } = 15;
         [Reactive] public bool onlySelectedNotes { get; set; } = false;
         [Reactive] public string tipInfo { get; set; } = "";
-
+        // end add
         public NotesViewModel() {
             SnapDivs = new List<MenuItemViewModel>();
             SetSnapUnitCommand = ReactiveCommand.Create<int>(div => {
@@ -161,10 +167,14 @@ namespace OpenUtau.App.ViewModels {
             Keys = new List<MenuItemViewModel>();
             SetKeyCommand = ReactiveCommand.Create<int>(key => {
                 DocManager.Inst.StartUndoGroup();
+                // change by Jack
                 DocManager.Inst.ExecuteCmd(new KeyCommand(Project, key, DocManager.Inst.playPosTick));
+                // end
                 DocManager.Inst.EndUndoGroup();
                 UpdateKey();
+                // add by Jack
                 MessageBus.Current.SendMessage(new PianorollRefreshEvent("Part"));
+                // end add
             });
 
             viewportTicks = this.WhenAnyValue(x => x.Bounds, x => x.TickWidth)
@@ -261,7 +271,7 @@ namespace OpenUtau.App.ViewModels {
                 DrawLinePitchTool = index == "4++";
                 KnifeTool = index == "5";
             });
-
+            // add by Jack
             IsMetronomePlaying = false;
             MetronomePlay = ReactiveCommand.Create(() => {
                 MetronomePlayer.Instance.UpdateOpenMetronome(IsMetronomePlaying);
@@ -278,7 +288,7 @@ namespace OpenUtau.App.ViewModels {
                     Preferences.Default.LockStartTime = 0;
                 }
             });
-
+            // end add
             ShowTips = Preferences.Default.ShowTips;
             IsSnapOn = true;
             SnapDivText = string.Empty;
@@ -320,6 +330,16 @@ namespace OpenUtau.App.ViewModels {
                 Preferences.Default.ShowPhoneme = showPhoneme;
                 Preferences.Save();
             });
+            ShowExpressions = Preferences.Default.ShowExpressions;
+            this.WhenAnyValue(x => x.ShowExpressions)
+            .Subscribe(showExpressions => {
+                ExpHeightMin = showExpressions
+                    ? ViewConstants.ExpHeightMin : 0;
+                ExpHeightMax = showExpressions
+                    ? ViewConstants.ExpHeightMax : 0;
+                Preferences.Default.ShowExpressions = showExpressions;
+                Preferences.Save();
+            });
             ShowNoteParams = Preferences.Default.ShowNoteParams;
             this.WhenAnyValue(x => x.ShowNoteParams)
             .Subscribe(showNoteParams => {
@@ -358,7 +378,7 @@ namespace OpenUtau.App.ViewModels {
                             break;
                     }
                 });
-
+            // add by Jack
             ShowNarrowTimeline = Preferences.Default.UseNarrowTimeline;
             ShowWidthTimeline = !Preferences.Default.UseNarrowTimeline;
             NarrowTimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
@@ -368,6 +388,7 @@ namespace OpenUtau.App.ViewModels {
                     ShowWidthTimeline = !Preferences.Default.UseNarrowTimeline;
                     NarrowTimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor);
                 });
+            // end add
         }
 
         private void UpdateSnapDiv() {
@@ -387,8 +408,10 @@ namespace OpenUtau.App.ViewModels {
         }
 
         private void UpdateKey(){
+            // change by Jack
             int key = Project.GetCurKey(DocManager.Inst.playPosTick);
             KeyText = "1="+MusicMath.KeysInOctave[key].Item1;
+            // end add
         }
 
         public void OnXZoomed(Point position, double delta) {
@@ -921,6 +944,7 @@ namespace OpenUtau.App.ViewModels {
                 }
             }
         }
+        // add by Jack
         public void DeselectCurvePoints() {
             tmpSelectionPoints.Clear();
             SelectionPoints.Clear();
@@ -1156,6 +1180,7 @@ namespace OpenUtau.App.ViewModels {
             DocManager.Inst.ExecuteCmd(new DeleteCurvePointsCommand(Project, Part, PrimaryKey, selection));
             DocManager.Inst.EndUndoGroup();
         }
+        // end add
         public async void PasteSelectedParams(PianoRollWindow window) {
             if (Part != null && DocManager.Inst.NotesClipboard != null && DocManager.Inst.NotesClipboard.Count > 0) {
                 var selectedNotes = Selection.ToList();
@@ -1326,9 +1351,13 @@ namespace OpenUtau.App.ViewModels {
                             SelectNote(focusNote.note);
                         }
                     }
-                } else if (cmd is ValidateProjectNotification
-                    || cmd is SingersRefreshedNotification
-                    || cmd is PhonemizedNotification) {
+                } else if (cmd is ValidateProjectNotification || cmd is SingersRefreshedNotification) {
+                    if (Part != null) {
+                        LoadPortrait(Part, Project);
+                    }
+                    OnPartModified();
+                    MessageBus.Current.SendMessage(new NotesRefreshEvent());
+                } else if (cmd is PhonemizedNotification) {
                     OnPartModified();
                     MessageBus.Current.SendMessage(new NotesRefreshEvent());
                 } else if (notif is PartRenderedNotification && notif.part == Part) {

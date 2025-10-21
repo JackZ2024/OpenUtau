@@ -294,6 +294,7 @@
               </ContextMenu>
             </Canvas.ContextMenu>
           </Canvas>
+          <!-- change by Jack --> 
           <c:TrackHeaderCanvas Grid.Row="2" Grid.Column="0" ClipToBounds="True" Background="Transparent"
                               DataContext="{Binding TracksViewModel}"
                               TrackHeight="{Binding TrackHeight}"
@@ -303,6 +304,7 @@
                              PointerReleased="TrackHeaderCanvasPointerReleased"
                              PointerWheelChanged="MainPagePointerWheelChanged"
                              Items="{Binding Tracks}"/>
+          <!-- end change  --> 
           <c:TrackBackground Grid.Row="2" Grid.Column="1" Margin="0" IsHitTestVisible="False"
                             Foreground="{DynamicResource TrackBackgroundAltBrush}"
                             DataContext="{Binding TracksViewModel}"
@@ -330,13 +332,15 @@
                         PointerReleased="PartsCanvasPointerReleased"
                         DoubleTapped="PartsCanvasDoubleTapped"
                         PointerWheelChanged="MainPagePointerWheelChanged">
-            <Rectangle Name="PlayPosHighlight" IsVisible="{Binding ShowWidthTimeline}"
+            <!-- change by Jack -->           
+            <Rectangle Name="PlayPosHighlight" IsVisible="{Binding ShowWidthTimeline}" 
                       Width="{Binding PlayPosHighlightWidth, Mode=OneWay}"
                       Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
                       Canvas.Left="{Binding PlayPosHighlightX, Mode=OneWay}"
                       Canvas.Top="0"
                       Fill="{DynamicResource NeutralAccentBrushSemi2}"
                       IsHitTestVisible="False"/>
+          <!-- add by Jack --> 
           <Rectangle Name="PlayPosHighlight2" IsVisible="{Binding ShowNarrowTimeline}"
                      Width="1"
                      Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
@@ -344,6 +348,7 @@
                      Canvas.Top="0" ZIndex="100"
                      Fill="{Binding NarrowTimelineColor}" 
                      IsHitTestVisible="False"/>
+            <!-- end add  --> 
             <Rectangle Name="SelectionBox" StrokeThickness="2"
                       Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
                       Fill="{DynamicResource TickLineBrushLow}" ZIndex="1000"
@@ -371,6 +376,10 @@
                           IsVisible="{Binding IsWavePart}"
                           Command="{Binding PartTranscribeCommand}"
                           CommandParameter="{Binding Part}"/>
+                <MenuItem Header="{DynamicResource context.part.merge}"
+                          IsVisible="{Binding IsVoicePart}"
+                          Command="{Binding PartMergeCommand}"
+                          CommandParameter="{Binding Part}"/>
               </ContextMenu>
             </c:PartsCanvas.ContextMenu>
           </c:PartsCanvas>
@@ -389,6 +398,7 @@
         </Grid>
       </Carousel>
     </Grid>
+    <!-- add by Jack --> 
     <Canvas Name="ValueTipCanvas" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" IsHitTestVisible="False">
         <Border Name="ValueTip" BorderThickness="1"
                 BorderBrush="{DynamicResource NeutralAccentBrush}"
@@ -396,5 +406,6 @@
             <TextBlock Name="ValueTipText" Margin="2"/>
         </Border>
     </Canvas>
+    <!-- end add  --> 
   </Grid>
 </Window>

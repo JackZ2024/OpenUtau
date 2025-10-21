@@ -12,6 +12,7 @@ namespace OpenUtau.Core.Ustx {
 
         public int position { get; set; }
         public string phoneme { get; set; }
+        // modify by Jack
         [YamlIgnore] public string phonemeMapped { get; private set; }
         [YamlIgnore] public UEnvelope envelope { get; private set; } = new UEnvelope();
         [YamlIgnore] public UOto oto { get; private set; }
@@ -34,7 +35,7 @@ namespace OpenUtau.Core.Ustx {
         [YamlIgnore] public UPhoneme Prev { get; set; }
         [YamlIgnore] public UPhoneme Next { get; set; }
         [YamlIgnore] public bool Error { get; set; } = false;
-
+        // end modify
         public override string ToString() => $"\"{phoneme}\" pos:{position}";
 
         public UPhoneme Clone() {

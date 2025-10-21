@@ -86,7 +86,7 @@ namespace OpenUtau.Core {
             UpdateTrackNo();
         }
     }
-
+    // add by Jack
     public class AdjustTrackCommand : TrackCommand {
         public int oldIndex;
         public int index;
@@ -118,7 +118,7 @@ namespace OpenUtau.Core {
             UpdateTrackNo();
         }
     }
-
+    // end add
     public class RenameTrackCommand : TrackCommand {
         readonly string newName, oldName;
         public RenameTrackCommand(UProject project, UTrack track, string name) {

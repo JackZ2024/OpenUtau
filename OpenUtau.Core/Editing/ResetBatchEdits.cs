@@ -241,6 +241,7 @@ namespace OpenUtau.Core.Editing {
             docManager.EndUndoGroup();
         }
     }
+    // add by Jack
     public class ResetPhonemes : BatchEdit {
         public virtual string Name => name;
 
@@ -255,7 +256,7 @@ namespace OpenUtau.Core.Editing {
             project.ValidateFull();
         }
     }
-
+    // end add
     public class ResetAll : BatchEdit {
         public virtual string Name => name;
 

@@ -73,8 +73,10 @@ namespace OpenUtau.App.ViewModels {
             = new ObservableCollectionExtended<MenuItemViewModel>();
         public ObservableCollectionExtended<MenuItemViewModel> NotesContextMenuItems { get; private set; }
             = new ObservableCollectionExtended<MenuItemViewModel>();
+        // add by Jack
         public ObservableCollectionExtended<MenuItemViewModel> RemarkContextMenuItems { get; private set; }
             = new ObservableCollectionExtended<MenuItemViewModel>();
+        // end add
         public Dictionary<Key, MenuItemViewModel> LegacyPluginShortcuts { get; private set; }
             = new Dictionary<Key, MenuItemViewModel>();
 
@@ -89,8 +91,9 @@ namespace OpenUtau.App.ViewModels {
         public ReactiveCommand<PitchPointHitInfo, Unit> PitSnapCommand { get; set; }
         public ReactiveCommand<PitchPointHitInfo, Unit> PitDelCommand { get; set; }
         public ReactiveCommand<PitchPointHitInfo, Unit> PitAddCommand { get; set; }
+        // add by Jack
         public ReactiveCommand<List<UNote>, Unit> MergeNotesCommand { get; set; }
-
+        // end add
         private ReactiveCommand<Classic.Plugin, Unit> legacyPluginCommand;
 
         public PianoRollViewModel() {
@@ -147,13 +150,14 @@ namespace OpenUtau.App.ViewModels {
                 DocManager.Inst.ExecuteCmd(new AddPitchPointCommand(NotesViewModel.Part, info.Note, new PitchPoint(info.X, info.Y), info.Index + 1));
                 DocManager.Inst.EndUndoGroup();
             });
+            // add by Jack
             MergeNotesCommand = ReactiveCommand.Create<List<UNote>>(notes => {
                 if (NotesViewModel.Part == null) { return; }
                 DocManager.Inst.StartUndoGroup();
                 DocManager.Inst.ExecuteCmd(new MergeNotesCommand(NotesViewModel.Part, notes));
                 DocManager.Inst.EndUndoGroup();
             });
-
+            // end add
             legacyPluginCommand = ReactiveCommand.Create<Classic.Plugin>(plugin => {
                 if (NotesViewModel.Part == null || NotesViewModel.Part.notes.Count == 0) {
                     return;
@@ -226,9 +230,11 @@ namespace OpenUtau.App.ViewModels {
         public void Copy() => NotesViewModel.CopyNotes();
         public void Paste() => NotesViewModel.PasteNotes();
         public void Delete() => NotesViewModel.DeleteSelectedNotes();
+        // add by Jack
         public void CopyPoints() => NotesViewModel.CopyCurvePoints();
         public void PastePoints() => NotesViewModel.PasteCurvePoints();
         public void DeletePoints() => NotesViewModel.DeleteCurvePoints();
+        // end add
         public void SelectAll() => NotesViewModel.SelectAllNotes();
 
         public void MouseoverPhoneme(UPhoneme? phoneme) {

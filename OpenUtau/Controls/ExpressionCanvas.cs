@@ -67,7 +67,9 @@ namespace OpenUtau.App.Controls {
         private bool showRealCurve = true;
 
         private HashSet<UNote> selectedNotes = new HashSet<UNote>();
+        // add by Jack
         private HashSet<int> selectedPoints = new HashSet<int>();
+        // end add
         private Geometry pointGeometry;
         private Geometry circleGeometry;
 
@@ -84,7 +86,7 @@ namespace OpenUtau.App.Controls {
                     selectedNotes.UnionWith(e.tempSelectedNotes);
                     InvalidateVisual();
                 });
-
+            // add by Jack
             MessageBus.Current.Listen<CurvesRefreshEvent>()
                 .Subscribe(_ => InvalidateVisual());
             MessageBus.Current.Listen<CurvePointsSelectionEvent>()
@@ -93,6 +95,7 @@ namespace OpenUtau.App.Controls {
                     selectedPoints.UnionWith(e.selectedPoints);
                     InvalidateVisual();
                 });
+           // end add
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change) {
@@ -157,6 +160,7 @@ namespace OpenUtau.App.Controls {
                     double y2 = defaultHeight - Bounds.Height * (value2 - descriptor.defaultValue) / (descriptor.max - descriptor.min);
                     var pen = value1 == descriptor.defaultValue && value2 == descriptor.defaultValue ? lPen : lPen2;
                     context.DrawLine(pen, new Point(x1, y1), new Point(x2, y2));
+                    // modify by Jack
                     if(viewModel.IsEditCurve && viewModel.PrimaryKey == descriptor.abbr) {
                         using (var state = context.PushTransform(Matrix.CreateTranslation(x1, y1))) {
                             context.DrawGeometry(brush, null, pointGeometry);
@@ -165,6 +169,7 @@ namespace OpenUtau.App.Controls {
                             context.DrawEllipse(null, lPen2, new Point(x1, y1), 4, 4);
                         }
                     }
+                    // end modify
                     index++;
                     if (tick2 >= rTick) {
                         break;

@@ -23,8 +23,10 @@
         <RowDefinition Height="24"/>
         <RowDefinition Height="24"/>
         <RowDefinition Height="*" MinHeight="200"/>
-        <RowDefinition Height="10"/>
-        <RowDefinition Height="150" MinHeight="132" MaxHeight="600"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="150" 
+                       MinHeight="{Binding NotesViewModel.ExpHeightMin}"
+                       MaxHeight="{Binding NotesViewModel.ExpHeightMax}"/>
         <RowDefinition Height="4"/>
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
@@ -65,7 +67,7 @@
                          PointerPressed="KeyboardPointerPressed"
                          PointerMoved="KeyboardPointerMoved"
                          PointerReleased="KeyboardPointerReleased"/>
-      <Grid  Grid.Column="0" Grid.Row="5">
+      <Grid Grid.Column="0" Grid.Row="5" IsVisible="{Binding NotesViewModel.ShowExpressions}">
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
           <RowDefinition Height="24"/>
@@ -107,11 +109,13 @@
           </Path>
         </Button>
       </Grid>
+      <!-- add by Jack --> 
       <c:RemarkCanvas Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0" Height="20"
                         Background="{DynamicResource BackgroundBrushSemi}"
                         TickWidth="{Binding NotesViewModel.TickWidth}"
                         TickOffset="{Binding NotesViewModel.TickOffset}"
                         Part="{Binding NotesViewModel.Part}"/>
+      <!-- end add  --> 
       <Canvas Name="TimelineCanvas" Grid.Row="2" Grid.Column="1"
               Background="Transparent" ClipToBounds="True"
               PointerWheelChanged="TimelinePointerWheelChanged"
@@ -123,6 +127,7 @@
               Canvas.Top="0" ZIndex="100" IsHitTestVisible="False"
               Fill="{DynamicResource NeutralAccentBrushSemi}"
               Data="M -6.5 0 L 6.5 0 L 6.5 3 L 0 9 L -6.5 3 Z"/>
+        <!-- add by Jack --> 
         <Canvas.ContextMenu>
             <ContextMenu ItemsSource="{Binding RemarkContextMenuItems}"
                         Opening="RemarkContextMenuOpening"
@@ -138,6 +143,7 @@
                 </ContextMenu.Styles>
             </ContextMenu>
         </Canvas.ContextMenu>
+        <!-- end add  --> 
       </Canvas>
       <c:TrackBackground Grid.Row="3" Grid.Column="1" IsHitTestVisible="False"
                          Foreground="{DynamicResource TrackBackgroundAltBrush}"
@@ -157,6 +163,7 @@
                         ShowBarNumber="True"/>
       <Image Grid.Row="3" Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,100,0"
              Source="{Binding NotesViewModel.Portrait}" OpacityMask="{Binding NotesViewModel.PortraitMask}" Stretch="None"/>
+      <!-- modify by Jack --> 
       <Border Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
               Margin="0,0,0,60" Height="{Binding NotesViewModel.WavShapeBorderHeight}" IsHitTestVisible="False">
         <c:WaveformImage DataContext="{Binding NotesViewModel, Mode=OneWay}"
@@ -164,6 +171,7 @@
                          TickOffset="{Binding TickOffset, Mode=OneWay}"
                          ShowWaveform="{Binding ShowWaveform, Mode=OneWay}"/>
       </Border>
+      <!-- end modify --> 
       <c:NotesCanvas Grid.Row="3" Grid.Column="1"
                      TickWidth="{Binding NotesViewModel.TickWidth}"
                      TrackHeight="{Binding NotesViewModel.TrackHeight}"
@@ -195,18 +203,21 @@
         </c:NotesCanvas.ContextMenu>
       </c:NotesCanvas>
       <Canvas Grid.Row="3" Grid.Column="1" IsHitTestVisible="False" ClipToBounds="True">
+        <!-- modify by Jack --> 
         <Rectangle Name="PlayPosHighlight" IsVisible="{Binding NotesViewModel.ShowWidthTimeline}"
                    Width="{Binding NotesViewModel.PlayPosHighlightWidth, Mode=OneWay}"
                    Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
                    Canvas.Left="{Binding NotesViewModel.PlayPosHighlightX, Mode=OneWay}"
                    Canvas.Top="0" ZIndex="-10"
                    Fill="{DynamicResource NeutralAccentBrushSemi2}"/>
+        <!-- add by Jack --> 
         <Rectangle Name="PlayPosHighlight2" IsVisible="{Binding NotesViewModel.ShowNarrowTimeline}"
                    Width="1"
                    Height="{Binding $parent.Bounds.Height, Mode=OneWay}"
                    Canvas.Left="{Binding NotesViewModel.PlayPosX, Mode=OneWay}"
                    Canvas.Top="0" ZIndex="100"
                    Fill="{Binding NotesViewModel.NarrowTimelineColor}"/>
+        <!-- end add  --> 
         <Rectangle Name="SelectionBox" StrokeThickness="2"
                    Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
                    Fill="{DynamicResource TickLineBrushLow}" ZIndex="1000"
@@ -251,10 +262,12 @@
               <MenuItem Header="{DynamicResource menu.edit.paste}" InputGesture="Ctrl+V" Command="{Binding Paste}"/>
               <MenuItem Header="{DynamicResource menu.edit.delete}" InputGesture="Delete" Command="{Binding Delete}"/>
               <MenuItem Header="-" Height="1"/>
+              <!-- add by Jack --> 
               <MenuItem Header="{DynamicResource menu.edit.copypoints}" InputGesture="Shift+C" Command="{Binding CopyPoints}"/>
               <MenuItem Header="{DynamicResource menu.edit.pastepoints}" InputGesture="Shift+V" Command="{Binding PastePoints}"/>
               <MenuItem Header="{DynamicResource menu.edit.deletepoints}" InputGesture="Shift+Delete" Command="{Binding DeletePoints}"/>
               <MenuItem Header="-" Height="1"/>
+              <!-- end add  --> 
               <MenuItem Header="{DynamicResource pianoroll.menu.searchnote}" InputGesture="Ctrl+F" Click="OnMenuSearchNote"/>
               <MenuItem Header="{DynamicResource menu.edit.selectall}" InputGesture="Ctrl+A" Command="{Binding SelectAll}"/>
               <MenuItem Header="-" Height="1"/>
@@ -361,7 +374,9 @@
             </MenuItem>
             <MenuItem Header="{DynamicResource pianoroll.menu.lyrics.edit}" Click="OnMenuEditLyrics"/>
             <MenuItem Header="{DynamicResource pianoroll.menu.notedefaults}" Click="OnMenuNoteDefaults"/>
+            <!-- add by Jack --> 
             <MenuItem Header="{DynamicResource editcurve.curveadjust}" Click="OnMenuCurveEdit"/>
+            <!-- end add  --> 
           </Menu>
         </Border>
         <Border Grid.Column="2">
@@ -375,7 +390,7 @@
             </ToggleButton>
             <Border Width="12"/>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.CursorTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.CursorTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="1"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.selectionv2}">
               <Grid Width="18" Height="18">
@@ -390,7 +405,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.PenTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.PenTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="2"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.penv2}">
               <Grid Width="18" Height="18">
@@ -405,7 +420,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.PenPlusTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.PenPlusTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="2+"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.penplus}">
               <Grid Width="18" Height="18">
@@ -420,7 +435,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.EraserTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.EraserTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="3"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.eraser}">
               <Grid Width="18" Height="18">
@@ -435,7 +450,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.DrawPitchTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.DrawPitchTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="4"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.drawpitch}">
               <Grid Width="18" Height="18">
@@ -450,7 +465,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.OverwritePitchTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.OverwritePitchTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="4+"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.overwritepitch}">
               <Grid Width="18" Height="18">
@@ -465,7 +480,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.DrawLinePitchTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.DrawLinePitchTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="4++"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.drawlinepitch}">
               <Grid Width="18" Height="18">
@@ -480,7 +495,7 @@
               </Grid>
             </ToggleButton>
             <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" Width="20"
-                          IsChecked="{Binding NotesViewModel.KnifeTool, Mode=OneWay}"
+                          IsChecked="{Binding NotesViewModel.KnifeTool}"
                           Command="{Binding NotesViewModel.SelectToolCommand}" CommandParameter="5"
                           ToolTip.Tip="{DynamicResource pianoroll.tool.knife}">
               <Grid Width="18" Height="18">
@@ -551,6 +566,15 @@
                 <Path Classes="stroked" Data="M 3 13 L 6 5.5 L 12 5.5 L 15 13"/>
               </Grid>
             </ToggleButton>
+            <ToggleButton Classes="toolbar" Margin="0" Padding="1" Height="20" IsChecked="{Binding NotesViewModel.ShowExpressions}"
+                          ToolTip.Tip="{DynamicResource pianoroll.toggle.expressions}">
+              <Grid Width="18" Height="18">
+                <Ellipse Classes="stroked" Height="4" Width="4" Margin="4,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Ellipse Classes="stroked" Height="4" Width="4" Margin="0,6,4,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                <Path Classes="stroked" Data="M 6 8 V 13.62"/>
+                <Path Classes="stroked" Data="M 12 10 V 13.62"/>
+              </Grid>
+            </ToggleButton>
             <ToggleButton Name="SnapToggle" Classes="toolbar" Margin="0" Padding="1" Height="20" IsChecked="{Binding NotesViewModel.IsSnapOn}"
                           ToolTip.Tip="{DynamicResource pianoroll.toggle.snap}">
               <Border Width="18" Height="18">
@@ -577,6 +601,7 @@
                              ItemsSource="{Binding NotesViewModel.Keys}" KeyDown="OnKeyKeyDown"/>
               </Button.ContextMenu>
             </Button>
+            <!-- add by Jack --> 
             <ToggleButton Name="Metronome" Classes="toolbar" Margin="0" Padding="1" Height="20" 
                           IsChecked="{Binding NotesViewModel.IsMetronomePlaying}"
                           Command="{Binding NotesViewModel.MetronomePlay}"
@@ -614,6 +639,7 @@
                            DoubleTapped="TimeDoubleTapped"/>
               </Grid>
             </Border>
+            <!-- end add  --> 
           </StackPanel>
         </Border>
         <Border Grid.Column="4">
@@ -658,12 +684,15 @@
                        PointerPressed="PhonemeCanvasPointerPressed"
                        PointerMoved="PhonemeCanvasPointerMoved"
                        PointerReleased="PhonemeCanvasPointerReleased"/>
-      <GridSplitter Grid.Row="4" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Focusable="False" Cursor="SizeNorthSouth"/>
+      <GridSplitter Grid.Row="4" Grid.ColumnSpan="3" Height="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}" IsVisible="{Binding NotesViewModel.ShowExpressions}"
+                    Focusable="False" Cursor="SizeNorthSouth"/>
       <c:TrackBackground Grid.Row="5" Grid.Column="1" IsHitTestVisible="False"
+                         IsVisible="{Binding NotesViewModel.ShowExpressions}"
                          Foreground="{DynamicResource TrackBackgroundAltBrush}"
                          TrackHeight="{Binding NotesViewModel.ExpTrackHeight}"/>
       <c:TickBackground Grid.Row="5"  Grid.Column="1" IsHitTestVisible="False"
+                        IsVisible="{Binding NotesViewModel.ShowExpressions}"
                         Foreground="{DynamicResource TickLineBrush}"
                         Background="{DynamicResource TickLineBrushLow}"
                         Resolution="{Binding PlaybackViewModel.Resolution}"
@@ -672,12 +701,14 @@
                         TickOffset="{Binding NotesViewModel.TickOffset}"
                         SnapDiv="{Binding NotesViewModel.SnapDiv, Mode=OneWay}"/>
       <c:ExpressionCanvas Grid.Row="5" Grid.Column="1" Opacity="{Binding NotesViewModel.ExpShadowOpacity}"
+                          IsVisible="{Binding NotesViewModel.ShowExpressions}"
                           TickWidth="{Binding NotesViewModel.TickWidth}"
                           TickOffset="{Binding NotesViewModel.TickOffset}"
                           Part="{Binding NotesViewModel.Part}"
                           Key="{Binding NotesViewModel.SecondaryKey}"
                           ShowRealCurve="False"/>
       <c:ExpressionCanvas Grid.Row="5" Grid.Column="1"
+                          IsVisible="{Binding NotesViewModel.ShowExpressions}"
                           Bounds="{Binding NotesViewModel.ExpBounds, Mode=OneWayToSource}"
                           TickWidth="{Binding NotesViewModel.TickWidth}"
                           TickOffset="{Binding NotesViewModel.TickOffset}"
@@ -689,12 +720,14 @@
                           PointerReleased="ExpCanvasPointerReleased"
                           PointerWheelChanged="ExpCanvasPointerWheelChanged">
       </c:ExpressionCanvas>
+      <!-- add by Jack --> 
       <Canvas Grid.Row="5" Grid.Column="1" IsHitTestVisible="False" ClipToBounds="True">
         <Rectangle Name="PointsSelectionBox" StrokeThickness="2"
                    Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
                    Fill="{DynamicResource TickLineBrushLow}" ZIndex="1000"
                    IsHitTestVisible="False" IsVisible="False"/>
       </Canvas>
+      <!-- end add  --> 
       <TextBlock Classes="tips" Grid.Row="5" Grid.Column="1"
                  IsHitTestVisible="False" VerticalAlignment="Bottom" Margin="10,5"
                  IsVisible="{Binding NotesViewModel.PrimaryKeyNotSupported}"
@@ -735,7 +768,8 @@
         </Border>
       </Grid>
       <Border Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-              BoxShadow="inset 0 0 5 1 #3F000000" ClipToBounds="True" IsHitTestVisible="False">
+              IsVisible="{Binding NotesViewModel.ShowExpressions}" BoxShadow="inset 0 0 5 1 #3F000000"
+              ClipToBounds="True" IsHitTestVisible="False">
         <Border Classes="tips" HorizontalAlignment="Center" VerticalAlignment="Center"
                 IsVisible="{Binding NotesViewModel.ShowTips}" BoxShadow="0 0 5 1 #3F000000">
           <TextBlock Classes="tips" Grid.Column="0" Margin="10,5"

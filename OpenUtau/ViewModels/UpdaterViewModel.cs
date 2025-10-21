@@ -85,7 +85,9 @@ namespace OpenUtau.App.ViewModels {
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             client.DefaultRequestHeaders.Add("User-Agent", "Other");
             client.Timeout = TimeSpan.FromSeconds(30);
+            // modify by Jack
             using var resposne = await client.GetAsync("https://api.github.com/repos/JackZ2024/OpenUtau/releases");
+            // end modify
             resposne.EnsureSuccessStatusCode();
             string respBody = await resposne.Content.ReadAsStringAsync();
             List<GithubRelease>? releases = JsonConvert.DeserializeObject<List<GithubRelease>>(respBody);
@@ -104,7 +106,7 @@ namespace OpenUtau.App.ViewModels {
                 .Where(a => a.name == $"appcast.{OS.GetUpdaterRid()}{suffix}.xml")
                 .FirstOrDefault();
         }
-
+        // add by Jack
         public static void UpdateVersionInfo(ref UpdateInfo updateInfo) {
 
             if (updateInfo.Status == UpdateStatus.UpdateAvailable) {
@@ -146,7 +148,7 @@ namespace OpenUtau.App.ViewModels {
                 }
             }
         }
-
+        // end add
         async void Init() {
             UpdaterStatus = ThemeManager.GetString("updater.status.checking");
             sparkle = await NewUpdaterAsync();
@@ -159,7 +161,9 @@ namespace OpenUtau.App.ViewModels {
                 UpdaterStatus = ThemeManager.GetString("updater.status.unknown");
                 return;
             }
+            // add by Jack
             UpdateVersionInfo(ref updateInfo);
+            // end add
 
             switch (updateInfo.Status) {
                 case UpdateStatus.UpdateAvailable:

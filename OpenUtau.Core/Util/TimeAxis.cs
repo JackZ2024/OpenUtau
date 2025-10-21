@@ -121,11 +121,12 @@ namespace OpenUtau.Core {
             var segment = tempoSegments.First(seg => seg.tickPos == tick || seg.tickEnd > tick); // TODO: optimize
             return segment.bpm;
         }
+        // add by Jack
         public int GetBarLengthAtTick(int tick) {
             var segment = timeSigSegments.First(seg => seg.tickPos == tick || seg.tickEnd > tick); // TODO: optimize
             return segment.ticksPerBar;
         }
-
+        // end add
         public double TickPosToMsPos(double tick) {
             var segment = tempoSegments.First(seg => seg.tickPos == tick || seg.tickEnd > tick); // TODO: optimize
             return segment.msPos + segment.msPerTick * (tick - segment.tickPos);
