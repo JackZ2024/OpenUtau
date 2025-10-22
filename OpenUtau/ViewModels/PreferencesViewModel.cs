@@ -69,6 +69,15 @@ namespace OpenUtau.App.ViewModels {
             get => _colors;
             set => this.RaiseAndSetIfChanged(ref _colors, value);
         }
+
+        [Reactive] public bool EnableGetPitch { get; set; }
+        public List<string> GetPitchAlgOptions { get; set; }
+        [Reactive] public string GetPitchAlg { get; set; }
+        public List<string> CrepeModelOptions { get; set; }
+        [Reactive] public string CrepeModel { get; set; }
+        [Reactive] public string BatchSize { get; set; }
+        [Reactive] public bool ShowCrepeOption { get; set; }
+
         // end add
 
         // Paths
@@ -201,7 +210,7 @@ namespace OpenUtau.App.ViewModels {
             UseNarrowTimeline = Preferences.Default.UseNarrowTimeline;
             TimelineColor = Brush.Parse(Preferences.Default.NarrowTimelineColor); 
             BreathNoteString = Preferences.Default.BreathNoteString;
-
+            
             _colors = new List<IBrush>
             {
                 Brushes.White,
@@ -218,6 +227,18 @@ namespace OpenUtau.App.ViewModels {
                 Brushes.LightGreen,
                 Brushes.DarkGreen
             };
+
+            EnableGetPitch = Preferences.Default.EnableGetPitch;
+            GetPitchAlgOptions = new List<string> { "Crepe", "Praat" };
+            GetPitchAlg = String.IsNullOrEmpty(Preferences.Default.GetPitchAlg) ?
+               GetPitchAlgOptions[0] : Preferences.Default.GetPitchAlg;
+            CrepeModelOptions = new List<string> { "tiny", "full" };
+            CrepeModel = String.IsNullOrEmpty(Preferences.Default.CrepeModel) ?
+               CrepeModelOptions[0] : Preferences.Default.CrepeModel;
+
+            BatchSize = Preferences.Default.BatchSize.ToString();
+            ShowCrepeOption = (GetPitchAlg == "Crepe");
+
             // end add
             this.WhenAnyValue(vm => vm.AudioOutputDevice)
                 .WhereNotNull()
@@ -440,6 +461,32 @@ namespace OpenUtau.App.ViewModels {
                    Preferences.Default.BreathNoteString = breathnotes.Replace("，", ",");
                    Preferences.Save();
                });
+
+            this.WhenAnyValue(vm => vm.EnableGetPitch)
+               .Subscribe(enableGetPitch => {
+                   Preferences.Default.EnableGetPitch = enableGetPitch;
+                   Preferences.Save();
+               });
+
+            this.WhenAnyValue(vm => vm.GetPitchAlg)
+                .Subscribe(index => {
+                    Preferences.Default.GetPitchAlg = index;
+                    Preferences.Save();
+                    ShowCrepeOption = (index == "Crepe");
+                });
+            this.WhenAnyValue(vm => vm.CrepeModel)
+                .Subscribe(index => {
+                    Preferences.Default.CrepeModel = index;
+                    Preferences.Save();
+                });
+            this.WhenAnyValue(vm => vm.BatchSize)
+                .Subscribe(batchSize => {
+                    try {
+                        Preferences.Default.BatchSize = int.Parse(batchSize);
+                        Preferences.Save();
+                    }
+                    catch { }
+                });
             // end add
         }
 

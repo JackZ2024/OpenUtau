@@ -529,6 +529,10 @@ Syntax: prefix,suffix</system:String>-->
   <system:String x:Key="prefs.rendering.skipmuted">跳过静音音轨</system:String>
   <!-- add by Jack  -->
   <system:String x:Key="prefs.rendering.keepphonemeslength">保留音素时长</system:String>
+  <system:String x:Key="prefs.rendering.enablepitch">启用音高获取</system:String>
+  <system:String x:Key="prefs.rendering.pitchalg">音高获取方法</system:String>
+  <system:String x:Key="prefs.rendering.crepemodel">Crepe 模型</system:String>
+  <system:String x:Key="prefs.rendering.batchsize">批次大小</system:String>
   <!-- end add  -->
   <system:String x:Key="prefs.rendering.threads.cpuwarn">
     警告：渲染线程过多可能会导致OpenUtau运行缓慢

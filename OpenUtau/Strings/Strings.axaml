@@ -531,6 +531,10 @@ Warning: this option removes custom presets.</system:String>
   <system:String x:Key="prefs.rendering.threads.cpuwarn">Warning: too many render threads may cause OpenUtau to run slowly.</system:String>
   <!-- add by Jack  --> 
   <system:String x:Key="prefs.rendering.keepphonemeslength">Keep Phonemes Length</system:String>
+  <system:String x:Key="prefs.rendering.enablepitch">Enable Get Pitch</system:String>
+  <system:String x:Key="prefs.rendering.pitchalg">Get Pitch Alg</system:String>
+  <system:String x:Key="prefs.rendering.crepemodel">Crepe Model</system:String>
+  <system:String x:Key="prefs.rendering.batchsize">Batch Size</system:String>
   <!-- end add  --> 
   <system:String x:Key="prefs.rendering.threads.numthreads">Maximum Render Threads</system:String>
   <system:String x:Key="prefs.rendering.wavtool">Wavtool</system:String>

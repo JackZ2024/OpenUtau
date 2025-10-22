@@ -197,11 +197,17 @@ namespace OpenUtau.Core.Util {
             public bool LockUnselectedNotesPitch = true;
             public bool LockUnselectedNotesVibrato = true;
             public bool LockUnselectedNotesExpressions = true;
+
             // add by Jack
             public bool UseNarrowTimeline = false;
             public string NarrowTimelineColor = "Black";
-            // end add
             public string BreathNoteString = "[AP],[EP]";
+
+            public bool EnableGetPitch = true;
+            public string GetPitchAlg = "Crepe";
+            public string CrepeModel = "full";
+            public int BatchSize = 1024;
+            // end add
 
             public bool VoicebankPublishUseIgnore = true;
             public string VoicebankPublishIgnores = @"#Adobe Audition

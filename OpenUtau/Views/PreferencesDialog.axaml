@@ -169,10 +169,10 @@
             <TextBlock Text="{DynamicResource prefs.penplus}" HorizontalAlignment="Left"/>
             <ToggleSwitch IsChecked="{Binding PenPlusDefault}"/>
           </Grid>
-                <!-- add by Jack --> 
-                <TextBlock Text="{DynamicResource prefs.breathnots}" Margin="0,10,0,10" HorizontalAlignment="Left"/>
-                <TextBox Name="TextBox" Text="{Binding BreathNoteString}"/>
-                <!-- end add --> 
+          <!-- add by Jack --> 
+          <TextBlock Text="{DynamicResource prefs.breathnots}" Margin="0,10,0,10" HorizontalAlignment="Left"/>
+          <TextBox Name="TextBox" Text="{Binding BreathNoteString}"/>
+          <!-- end add --> 
         </StackPanel>
 
         <!-- Rendering -->
@@ -202,10 +202,10 @@
           </Grid>
           <!-- add by Jack -->
           <Grid>
-               <TextBlock Text="{DynamicResource prefs.rendering.keepphonemeslength}" HorizontalAlignment="Left"/>
-               <ToggleSwitch IsChecked="{Binding KeepPhonemesLength}"/>
-            </Grid>
-            <!-- end add -->
+             <TextBlock Text="{DynamicResource prefs.rendering.keepphonemeslength}" HorizontalAlignment="Left"/>
+             <ToggleSwitch IsChecked="{Binding KeepPhonemesLength}"/>
+          </Grid>
+          <!-- end add -->
           <Grid>
             <TextBlock Text="{DynamicResource prefs.cache.clearonquit}" HorizontalAlignment="Left" />
             <ToggleSwitch IsChecked="{Binding ClearCacheOnQuit}" />
@@ -215,6 +215,26 @@
           <TextBlock Text="{DynamicResource prefs.rendering.onnxgpu}" Margin="0,10,0,0"/>
           <ComboBox ItemsSource="{Binding OnnxGpuOptions}" SelectedItem="{Binding OnnxGpu}"/>
           <TextBlock Classes="restart"/>
+          <!-- add by Jack -->
+          <Grid>
+            <TextBlock Text="{DynamicResource prefs.rendering.enablepitch}" HorizontalAlignment="Left" />
+            <ToggleSwitch IsChecked="{Binding EnableGetPitch}" />
+          </Grid>
+          <StackPanel>
+            <TextBlock Text="{DynamicResource prefs.rendering.pitchalg}" HorizontalAlignment="Left"/>
+            <ComboBox ItemsSource="{Binding GetPitchAlgOptions}" SelectedItem="{Binding GetPitchAlg}"/>
+          </StackPanel>
+          <StackPanel >
+            <TextBlock Text="{DynamicResource prefs.rendering.crepemodel}" HorizontalAlignment="Left" IsVisible="{Binding ShowCrepeOption}"/>
+            <ComboBox ItemsSource="{Binding CrepeModelOptions}" 
+                      SelectedItem="{Binding CrepeModel}" 
+                      IsVisible="{Binding ShowCrepeOption}"/>
+          </StackPanel>
+          <StackPanel>
+            <TextBlock Text="{DynamicResource prefs.rendering.batchsize}" HorizontalAlignment="Left" IsVisible="{Binding ShowCrepeOption}"/>
+            <TextBox Name="BatchSize" Text="{Binding BatchSize}" IsVisible="{Binding ShowCrepeOption}"/>
+          </StackPanel>
+          <!-- end add -->
         </StackPanel>
 
         <!-- Appearance -->
