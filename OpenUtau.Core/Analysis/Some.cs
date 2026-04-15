@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using NWaves.Signals;
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core.Util;
@@ -240,30 +241,6 @@ namespace OpenUtau.Core.Analysis.Some {
             return monoSamples;
         }
 
-        private float[] ReadAudioAsSampleRate(string inputPath, int targetRate) {
-            using (var reader = new AudioFileReader(inputPath)) {
-                var targetFormat = WaveFormat.CreateIeeeFloatWaveFormat(targetRate, reader.WaveFormat.Channels);
-
-                using (var resampler = new MediaFoundationResampler(reader, targetFormat)) {
-                    resampler.ResamplerQuality = 60; // 高质量
-
-                    var sampleProvider = resampler.ToSampleProvider();
-                    var allSamples = new List<float>();
-
-                    int blockSize = targetRate * reader.WaveFormat.Channels; // 约 1 秒大小
-                    float[] buffer = new float[blockSize];
-                    int read;
-
-                    while ((read = sampleProvider.Read(buffer, 0, buffer.Length)) > 0) {
-                        for (int i = 0; i < read; i++)
-                            allSamples.Add(buffer[i]);
-                    }
-
-                    return ToMono(allSamples.ToArray(), reader.WaveFormat.Channels);
-                }
-            }
-        }
-
         public UVoicePart Transcribe(UProject project, UWavePart wavePart, Action<int> progress) {
             //Run SOME model with the audio part user selected to extract note information
             //convert samples to mono and slice
@@ -404,10 +381,19 @@ namespace OpenUtau.Core.Analysis.Some {
                 if (Preferences.Default.GetPitchAlg == "Crepe") {
                     stepMs = 5;
                     var crepe = new Crepe.Crepe();
-                    float[] samples = ReadAudioAsSampleRate(wavePart.FilePath, 16000);
-                    DiscreteSignal signal = new DiscreteSignal(16000, samples);
-                    f0 = crepe.ComputeF0(signal, stepMs);
 
+                    using (var waveStream = Format.Wave.OpenFile(wavePart.FilePath)) {
+                        ISampleProvider provider = waveStream.ToSampleProvider();
+                        if (provider.WaveFormat.SampleRate != 16000) {
+                            provider = new WdlResamplingSampleProvider(provider, 16000);
+                        }
+                        if (provider.WaveFormat.Channels > 1) {
+                            provider = provider.ToMono();
+                        }
+
+                        DiscreteSignal signal = Format.Wave.GetSignal(provider);
+                        f0 = crepe.ComputeF0(signal, stepMs);
+                    }
                 } else if(Preferences.Default.GetPitchAlg == "Praat" && OS.IsWindows()) {
                     IntPtr pdata = Marshal.AllocHGlobal(wavePart.Samples.Length * sizeof(float));
                     Marshal.Copy(wavePart.Samples, 0, pdata, wavePart.Samples.Length);

@@ -205,7 +205,7 @@ namespace OpenUtau.Core.Util {
 
             public bool EnableGetPitch = true;
             public string GetPitchAlg = "Crepe";
-            public string CrepeModel = "full";
+            public string CrepeModel = "tiny";
             public int BatchSize = 1024;
             // end add
 

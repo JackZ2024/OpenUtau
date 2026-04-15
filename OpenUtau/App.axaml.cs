@@ -7,11 +7,19 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using Avalonia.Threading;
+using OpenUtau.App.ViewModels;
 using OpenUtau.App.Views;
+using OpenUtau.Core;
 using Serilog;
 
 namespace OpenUtau.App {
     public class App : Application {
+
+        // add by Jack
+        private static string[]? _pendingFiles;
+        // end add
+
         public override void Initialize() {
             Log.Information("Initializing application.");
             AvaloniaXamlLoader.Load(this);
@@ -24,10 +32,69 @@ namespace OpenUtau.App {
             Log.Information("Framework initialization completed.");
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
                 desktop.MainWindow = new SplashWindow();
+
+                // add by Jack
+                if (OS.IsMacOS()) {
+                    // 处理 macOS 的文件打开关联 (Avalonia 11.1+)
+                    var activatableLifetime = this.TryGetFeature(typeof(IActivatableLifetime)) as IActivatableLifetime;
+                    if (activatableLifetime != null) {
+                        activatableLifetime.Activated += OnAppActivated;
+                    }
+                }
+                // end add
             }
 
             base.OnFrameworkInitializationCompleted();
         }
+
+        // add by Jack
+        private void OnAppActivated(object? sender, ActivatedEventArgs e) {
+            if (e.Kind == ActivationKind.File) {
+                var fileArgs = e as FileActivatedEventArgs;
+                var filePath = fileArgs?.Files.FirstOrDefault()?.Path.LocalPath;
+
+                if (!string.IsNullOrEmpty(filePath)) {
+                    // 只有是 ustx 工程才处理
+                    if (filePath.EndsWith(".ustx", System.StringComparison.OrdinalIgnoreCase)) {
+                        // 使用 Dispatcher 异步处理，防止在 App 还没完全初始化时就加载工程导致崩溃
+                        Dispatcher.UIThread.Post(() => {
+                            HandleOpenFile(filePath);
+                        }, DispatcherPriority.Background);
+                    }
+                }
+            }
+        }
+        private void HandleOpenFile(string filePath) {
+            // 1. 检查路径是否有效
+            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath)) return;
+
+            // 2. 获取桌面生命周期对象
+            var desktop = ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+
+            // 3. 尝试获取 MainWindow 的 ViewModel
+            // OpenUtau 的主窗口 DataContext 就是 MainWindowViewModel
+            if (desktop?.MainWindow?.DataContext is MainWindowViewModel vm) {
+                // OpenUtau 的 OpenProject 接收的是字符串数组 string[]
+                if (!DocManager.Inst.ChangesSaved) { return; }
+                vm.OpenProject(new[] { filePath });
+                if (vm.Page == 0) {
+                    vm.Page = 1;
+                }
+
+            } else {
+                // 【关键点】冷启动处理：
+                // 如果此时 MainWindow 还没创建（比如还在闪屏界面 SplashWindow），
+                // 我们需要把路径存起来，等 MainWindow 初始化后再读。
+                // 你可以在 App 类里定义一个静态变量
+                _pendingFiles = new[] { filePath };
+            }
+        }
+        public static string[]? GetPendingFiles() {
+            var files = _pendingFiles;
+            _pendingFiles = null; // 取完清空
+            return files;
+        }
+        // end add
 
         public void InitializeCulture() {
             Log.Information("Initializing culture.");

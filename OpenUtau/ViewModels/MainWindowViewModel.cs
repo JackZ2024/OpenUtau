@@ -134,17 +134,31 @@ namespace OpenUtau.App.ViewModels {
                 }
             }
           
-            var args = Environment.GetCommandLineArgs();
-            if (args.Length == 2 && File.Exists(args[1])) {
-                try {
-                    Core.Format.Formats.LoadProject(new string[] { args[1] });
-                    Page = 1;
-                    DocManager.Inst.ExecuteCmd(new VoiceColorRemappingNotification(-1, true));
-                } catch (Exception e) {
-                    var customEx = new MessageCustomizableException($"Failed to open file {args[1]}", $"<translate:errors.failed.openfile>: {args[1]}", e);
-                    DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(customEx));
+            if(OS.IsMacOS()) {
+                var pending = App.GetPendingFiles();
+                if (pending != null) {
+                    try {
+                        Core.Format.Formats.LoadProject(pending);
+                        Page = 1;
+                        DocManager.Inst.ExecuteCmd(new VoiceColorRemappingNotification(-1, true));
+                    } catch (Exception e) {
+                        var customEx = new MessageCustomizableException($"Failed to open file {pending}", $"<translate:errors.failed.openfile>: {pending}", e);
+                        DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(customEx));
+                    }
                 }
-            }
+            }else {
+                var args = Environment.GetCommandLineArgs();
+                if (args.Length == 2 && File.Exists(args[1])) {
+                    try {
+                        Core.Format.Formats.LoadProject(new string[] { args[1] });
+                        Page = 1;
+                        DocManager.Inst.ExecuteCmd(new VoiceColorRemappingNotification(-1, true));
+                    } catch (Exception e) {
+                        var customEx = new MessageCustomizableException($"Failed to open file {args[1]}", $"<translate:errors.failed.openfile>: {args[1]}", e);
+                        DocManager.Inst.ExecuteCmd(new ErrorMessageNotification(customEx));
+                    }
+                }
+            }   
         }
 
         public void NewProject() {

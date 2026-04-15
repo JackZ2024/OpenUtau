@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import datetime
 import platform
+import plistlib
 
 # appcast_ver = os.environ.get('APPVEYOR_BUILD_VERSION')
 appcast_ver = "0.1.547.7"
@@ -31,6 +32,54 @@ def write_appcast(appcast_os, appcast_rid, appcast_file):
 
     with open("appcast.%s.xml" % (appcast_rid), 'w') as f:
         f.write(xml)
+        
+def patch_info_plist(app_bundle_path):
+    # 定位 Info.plist 的路径
+    plist_path = os.path.join(app_bundle_path, "Contents", "Info.plist")
+    
+    if not os.path.exists(plist_path):
+        print(f"Error: {plist_path} not found.")
+        return
+ 
+    # 读取现有的 plist
+    with open(plist_path, 'rb') as f:
+        pl = plistlib.load(f)
+ 
+    # 1. 定义要添加的 CFBundleDocumentTypes
+    new_doc_types = [
+        {
+            'CFBundleTypeName': 'OpenUtau Sequence File',
+            'LSItemContentTypes': ['com.stakira.openutau.ustx'],
+            'CFBundleTypeRole': 'Editor',
+            'LSHandlerRank': 'Owner',
+            'CFBundleTypeIconFile': 'OpenUtau.icns'
+        }
+    ]
+ 
+    # 2. 定义要添加的 UTExportedTypeDeclarations
+    new_uti_decls = [
+        {
+            'UTTypeIdentifier': 'com.stakira.openutau.ustx',
+            'UTTypeDescription': 'OpenUtau Sequence File',
+            'UTTypeConformsTo': ['public.data'],
+            'UTTypeTagSpecification': {
+                'public.filename-extension': ['ustx']
+            }
+        }
+    ]
+ 
+    # 写入数据（如果已存在则覆盖，不存在则创建）
+    pl['CFBundleDocumentTypes'] = new_doc_types
+    pl['UTExportedTypeDeclarations'] = new_uti_decls
+    
+    # 顺便确保一些基础字段正确
+    pl['CFBundleIconFile'] = 'OpenUtau.icns'
+ 
+    # 写回文件
+    with open(plist_path, 'wb') as f:
+        plistlib.dump(pl, f)
+    
+    print(f"Successfully patched {plist_path}")
 
 
 if sys.platform == 'win32':
@@ -73,10 +122,13 @@ elif sys.platform == 'darwin':
     # os.system("rm LICENSE.txt")
     os.system("sed -i '' \"s/0.0.0/%s/g\" OpenUtau/OpenUtau.csproj" % (appcast_ver))
     os.system(f"dotnet restore OpenUtau -r {appcast_rid}")
+    # 下面这个命令也是编译命令，可以用来检查编译的报错信息，下面的打包编译命令没有报错信息，编译不过去也不知道怎么回事。
+    # dotnet msbuild OpenUtau -t:BundleApp -p:Configuration=Release -v:detailed
     os.system(f"dotnet msbuild OpenUtau -t:BundleApp -p:Configuration=Release -p:RuntimeIdentifier={appcast_rid} \
               -p:UseAppHost=true -p:OutputPath=../bin/{appcast_rid}/ -p:PublishReadyToRun=false")
     
     os.system(f"cp OpenUtau/Assets/OpenUtau.icns bin/{appcast_rid}/publish/OpenUtau.app/Contents/Resources/")
+    patch_info_plist(f"./bin/{appcast_rid}/publish/OpenUtau.app")
     os.system("rm *.dmg")
     # 这个命令只需要执行一次，并且需要管理员权限，需要单独执行
     # os.system("npm install -g create-dmg")

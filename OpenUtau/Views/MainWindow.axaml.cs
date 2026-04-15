@@ -420,6 +420,7 @@ namespace OpenUtau.App.Views {
             var file = await FilePicker.SaveFileAboutProject(
                 this, "menu.file.exportmixdown", FilePicker.WAV);
             if (!string.IsNullOrEmpty(file)) {
+                if(!file.EndsWith(".wav")) { file = file + ".wav"; }
                 await PlaybackManager.Inst.RenderMixdown(project, file);
             }
         }
@@ -439,6 +440,7 @@ namespace OpenUtau.App.Views {
             var file = await FilePicker.SaveFileAboutProject(
                 this, "menu.file.exportwavto", FilePicker.WAV);
             if (!string.IsNullOrEmpty(file)) {
+                if (!file.EndsWith(".wav")) { file = file + ".wav"; }
                 await PlaybackManager.Inst.RenderToFiles(project, file);
             }
         }

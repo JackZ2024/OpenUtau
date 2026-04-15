@@ -33,7 +33,9 @@ namespace OpenUtau.Core.Analysis.Crepe {
 
         public Crepe() {
             if (Preferences.Default.CrepeModel == "full") {
-                session = Onnx.getInferenceSession("./full.onnx");
+                string appDirectory = AppContext.BaseDirectory;
+                string fullonnxPath = Path.Combine(appDirectory, "full.onnx");
+                session = Onnx.getInferenceSession(fullonnxPath);
             } else {
                 session = Onnx.getInferenceSession(Resources.tiny);
             }
